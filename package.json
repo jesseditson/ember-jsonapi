@@ -1,22 +1,18 @@
 {
   "name": "ember-jsonapi",
-  "version": "0.0.0",
-  "description": "The default blueprint for ember-cli addons.",
-  "directories": {
-    "doc": "doc",
-    "test": "tests"
-  },
+  "version": "0.0.1",
+  "description": "Create automatic database-backed JSONAPI endpoints from simple JSON schemas.",
   "scripts": {
     "build": "ember build",
     "start": "ember server",
     "test": "ember try:testall"
   },
-  "repository": "",
+  "repository": "git@github.com:jesseditson/ember-jsonapi.git",
   "engines": {
-    "node": ">= 0.10.0"
+    "node": ">= 5.0.0"
   },
-  "author": "",
-  "license": "MIT",
+  "author": "Jesse Ditson <jesse.ditson@gmail.com>",
+  "license": "ISC",
   "devDependencies": {
     "broccoli-asset-rev": "^2.4.2",
     "ember-ajax": "0.7.1",
