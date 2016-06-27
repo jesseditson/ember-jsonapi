@@ -35,10 +35,16 @@
     "loader.js": "^4.0.1"
   },
   "keywords": [
-    "ember-addon"
+    "ember-addon",
+    "jsonapi",
+    "schema",
+    "json",
+    "ember",
+    "model"
   ],
   "dependencies": {
-    "ember-cli-babel": "^5.1.6"
+    "ember-cli-babel": "^5.1.6",
+    "jsonapi-express": "^0.1.0"
   },
   "ember-addon": {
     "configPath": "tests/dummy/config"
