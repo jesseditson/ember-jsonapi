@@ -2,8 +2,6 @@ import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import relationships from 'ember-data/relationships';
 import { singularize } from 'ember-inflector';
-// TODO: instead of requiring that the model provides a schema, just import our own and use model names.
-// import schemas from 'schemas';
 
 export default function JSONAPIModel(schema) {
   return Model.extend(schemaParser(schema));

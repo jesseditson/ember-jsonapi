@@ -31,7 +31,6 @@
     "ember-export-application-global": "^1.0.5",
     "ember-load-initializers": "^0.5.1",
     "ember-resolver": "^2.0.3",
-    "ember-try": "^0.2.2",
     "loader.js": "^4.0.1"
   },
   "keywords": [
@@ -43,7 +42,9 @@
     "model"
   ],
   "dependencies": {
-    "ember-cli-babel": "^5.1.6",
+    "broccoli-json-module": "0.0.1",
+    "ember-cli-string-utils": "^1.0.0",
+    "inflection": "^1.10.0",
     "jsonapi-express": "^0.1.0"
   },
   "ember-addon": {

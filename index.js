@@ -1,28 +1,20 @@
-// var Funnel = require('broccoli-funnel');
-// var JSONModule = require('broccoli-json-module');
-// var MergeTrees = require('broccoli-merge-trees');
-// var WatchedDir = require('broccoli-source').WatchedDir;
+var path = require('path');
+var jsonModule = require('broccoli-json-module');
 
 module.exports = {
   name: 'ember-jsonapi',
 
   isDevelopingAddon: function() { return true; },
 
-  // TODO: figure out how to add the schemas to the resolver via `import schemas`
-  // included: function included(app, parentAddon) {
-  //   this._super.included(app);
-  //
-  //
-  //   // var target = (parentAddon || app);
-  //   //
-  //   // target.import(this.schemas);
-  // },
-  // treeForAddon(tree) {
-  //   tree = this._super.treeForAddon.call(this, tree);
-  //
-  // },
-  // treeForApp(tree) {
-  //   var schemasFolder = new WatchedDir('schemas');
-  //   return mergeTrees([tree, jsonModule(schemasFolder)]);
-  // }
+  blueprintsPath: function() {
+    return path.join(__dirname, 'blueprints');
+  },
+
+  treeForApp: function() {
+    return jsonModule(this.app.trees.app);
+  },
+
+  treeForTestSupport: function() {
+    return jsonModule(this.app.trees.tests);
+  }
 }
