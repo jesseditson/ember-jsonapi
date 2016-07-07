@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>ember-jsonapi by jesseditson</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">ember-jsonapi</h1>
+      <h2 class="project-tagline">Create automatic JSONAPI endpoints based on incredibly simple JSON schemas.</h2>
+      <a href="https://github.com/jesseditson/ember-jsonapi" class="btn">View on GitHub</a>
+      <a href="https://github.com/jesseditson/ember-jsonapi/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/jesseditson/ember-jsonapi/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h3>
+<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>introduction</h3>
+
+<p>ember-jsonapi is an ember-cli addon for creating automatic <a href="http://jsonapi.org/">JSON API</a> endpoints based on shared schemas written in JSON.</p>
+
+<p>JSON schemas are formatted to be familiar to ember developers, and include the ability to specify ember primitive types as strings, and ember relationship types as objects. A simple schema would look like this:</p>
+
+<p><strong>articles.json</strong></p>
+
+<div class="highlight highlight-source-json"><pre>{
+  <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>comments<span class="pl-pds">"</span></span>: {
+    <span class="pl-s"><span class="pl-pds">"</span>type<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>comments<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>relationship<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>hasMany<span class="pl-pds">"</span></span>
+  }
+}</pre></div>
+
+<p>For full schema API docs, see <a href="#todo">the jsonapi-schema API documentation</a></p>
+
+<p>ember-jsonapi comes with blueprints for the following types:</p>
+
+<ul>
+<li>
+<strong>schema</strong> (<code>ember generate schema [name]</code>) </li>
+</ul>
+
+<p>This creates a schema file and an associated ember model and model unit test.</p>
+
+<ul>
+<li>
+<strong>api</strong> (<code>ember generate api</code>)</li>
+</ul>
+
+<p>This generates ember-jsonapi server and api files, along with a session service and auth endpoint for authenticating users via <a href="https://jwt.io/">JSON web tokens</a>. This API automatically loads schemas from the application and sets up fully JSON API compatible endpoints under the <code>/api</code> endpoint. Additionally, this blueprint prepares the <code>/server</code> folder to be production-compatible, so you may deploy the ember application as an express application.</p>
+
+<h3>
+<a id="concepts" class="anchor" href="#concepts" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>concepts</h3>
+
+<p>The core functionality of this project is broken out into 3 npm modules:</p>
+
+<h4>
+<a id="jsonapi-schema" class="anchor" href="#jsonapi-schema" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>jsonapi-schema</code>
+</h4>
+
+<p>This module has two responsibilities:</p>
+
+<ul>
+<li>Loading schema json files from a local file system and serializing them to a json object.</li>
+</ul>
+
+<p>It handles both pod style <code>app/article/schema.json</code> and legacy style <code>app/schemas/article.json</code> paths, and while intended for use with ember-jsonapi, is framework agnostic.</p>
+
+<ul>
+<li>Generating a parser capable of handling simply formatted data and decorating with JSON API structure.</li>
+</ul>
+
+<p>A simple example of how to use this module is as follows:</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> path <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>path<span class="pl-pds">'</span></span>);
+<span class="pl-k">var</span> schema <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>jsonapi-schema<span class="pl-pds">'</span></span>);
+<span class="pl-k">var</span> schemas <span class="pl-k">=</span> <span class="pl-smi">schema</span>.<span class="pl-en">loadSchemas</span>(<span class="pl-smi">path</span>.<span class="pl-c1">join</span>(<span class="pl-c1">process</span>.<span class="pl-en">cwd</span>(), <span class="pl-s"><span class="pl-pds">'</span>app<span class="pl-pds">'</span></span>));
+
+<span class="pl-k">var</span> toJSONAPI <span class="pl-k">=</span> <span class="pl-en">JSONAPI</span>(schemas, <span class="pl-s"><span class="pl-pds">'</span>/api<span class="pl-pds">'</span></span>);
+<span class="pl-k">var</span> toArticle <span class="pl-k">=</span> <span class="pl-en">toJSONAPI</span>(<span class="pl-s"><span class="pl-pds">'</span>article<span class="pl-pds">'</span></span>);
+
+<span class="pl-k">var</span> response <span class="pl-k">=</span> <span class="pl-en">toArticle</span>({
+  id<span class="pl-k">:</span> <span class="pl-c1">1</span>,
+  title<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>JSON API Paints my bikeshed<span class="pl-pds">'</span></span>
+}, {
+  included<span class="pl-k">:</span> {
+    comments<span class="pl-k">:</span> [
+      { id<span class="pl-k">:</span> <span class="pl-c1">5</span>, body<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>First!<span class="pl-pds">'</span></span> }
+    ]
+  }
+})</pre></div>
+
+<p>In the above example, response would be serialized to the following:</p>
+
+<pre><code>{
+  "links": {
+    "self": "/api/articles"
+  },
+  "data": [{
+    "type": "articles",
+    "id": 1,
+    "attributes": {
+      "title": "JSON API paints my bikeshed!"
+    },
+    "relationships": {
+      "comments": {
+        "links": {
+          "self": "/api/articles/1/relationships/comments",
+          "related": "/api/articles/1/comments"
+        },
+        "data": [
+          { "type": "comments", "id": 5 }
+        ]
+      }
+    },
+    "links": {
+      "self": "/api/articles/1"
+    }
+  }],
+  "included": [{
+    "type": "comments",
+    "id": 5,
+    "attributes": {
+      "body": "First!"
+    },
+    "links": {
+      "self": "/api/comments/5"
+    }
+  }]
+}
+</code></pre>
+
+<p>The intent of <code>jsonapi-schema</code> is not necessarily to be used in an isolated context, but to provide a simple way of ingesting common relational database responses and serializing them to JSON API documents with as little manipulation as possible.</p>
+
+<h4>
+<a id="jsonapi-express" class="anchor" href="#jsonapi-express" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>jsonapi-express</code>
+</h4>
+
+<p>This module is an express middleware that is generated by passing schemas to it. When called with a schemas object (as generated by <code>jsonapi-schema</code> above), it will automatically create endpoints for the passed objects. For instance, building on the above example, you could load your schemas and call it like so:</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> <span class="pl-c1">JSONAPI</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>jsonapi-express<span class="pl-pds">'</span></span>);
+<span class="pl-k">var</span> schema <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>jsonapi-schema<span class="pl-pds">'</span></span>);
+<span class="pl-k">var</span> path <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>path<span class="pl-pds">'</span></span>);
+<span class="pl-k">var</span> schemas <span class="pl-k">=</span> <span class="pl-smi">schema</span>.<span class="pl-en">loadSchemas</span>(<span class="pl-smi">path</span>.<span class="pl-c1">join</span>(<span class="pl-c1">process</span>.<span class="pl-en">cwd</span>(), <span class="pl-s"><span class="pl-pds">'</span>app<span class="pl-pds">'</span></span>));
+
+<span class="pl-k">var</span> operations <span class="pl-k">=</span> {}; <span class="pl-c">// more on operations below</span>
+
+<span class="pl-smi">app</span>.<span class="pl-en">use</span>(<span class="pl-s"><span class="pl-pds">'</span>/api<span class="pl-pds">'</span></span>, <span class="pl-en">JSONAPI</span>(operations, schemas, <span class="pl-s"><span class="pl-pds">'</span>/api<span class="pl-pds">'</span></span>));</pre></div>
+
+<p>The above, when passed our article schema, would create the following endpoints:</p>
+
+<pre><code>GET    /api/articles
+GET    /api/articles/:id
+POST   /api/articles
+PATCH  /api/articles/:id
+DELETE /api/articles/:id
+GET    /api/articles/:id/comments
+GET    /api/articles/:id/relationships/comments
+POST   /api/articles/:id/relationships/comments
+PATCH  /api/articles/:id/relationships/comments
+DELETE /api/articles/:id/relationships/comments
+</code></pre>
+
+<p><code>jsonapi-express</code> handles setting the correct headers, returning the correct error codes, and aims to be a common module that can track against the JSON API spec without having to manually update resource routes in your application.</p>
+
+<p>To function though, <code>jsonapi-express</code> requires an operations object to be passed in, with the following required keys:</p>
+
+<ul>
+<li>
+<code>findAll</code>: a function for finding records</li>
+<li>
+<code>findOne</code>: a function for finding a single record</li>
+<li>
+<code>create</code>:  a function for creating a record</li>
+<li>
+<code>delete</code>:  a function for deleting a record</li>
+<li>
+<code>updateRelationship</code>: a function for updating the relationship between two records</li>
+</ul>
+
+<p>In addition, the following optional operations can be passed in:</p>
+
+<ul>
+<li>
+<code>transforms</code>: a hash of <code>[schema name] : [function]</code> pairs, which is called whenever this record is fetched from the db, before it is parsed by <code>jsonapi-schema</code>. This is useful for modifying data without having to specify an if statement inside of a query operation.</li>
+<li>
+<code>authorize</code>: an express middleware that is expected to either call <code>next</code> if the user is allowed to access <code>req.url</code>, or send a <code>4xx</code> if not.</li>
+</ul>
+
+<p>For more information on operation method signatures and usage, see the <a href="#todo">jsonapi-express documentation</a>.</p>
+
+<h4>
+<a id="jsonapi-knex" class="anchor" href="#jsonapi-knex" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>jsonapi-knex</code>
+</h4>
+
+<p>The final piece of <code>ember-jsonapi</code> is a preconfigured operations hash. <code>jsonapi-knex</code> exports a function that will generate an operations object so you don't have to write your own database queries. It uses <a href="http://knexjs.org/">knex.js</a> to build sql queries, and as such is compatible with Postgres, MSSQL, MySQL, MariaDB, SQLite3, and Oracle.</p>
+
+<p>It is fairly opinionated in the way it requests data, with the only configuration options being the database, schemas, and the option of specifying table names that differ from schema names. It is meant to be a base to build on rather than a comprehensive ORM.</p>
+
+<p>To tie all three together (which is what the <code>api</code> blueprint does), you'd do the following:</p>
+
+<pre><code>var JSONAPI = require('jsonapi-express');
+var schema = require('jsonapi-schema');
+var path = require('path');
+var schemas = schema.loadSchemas(path.join(process.cwd(), 'app'));
+var db = require('../lib/db');
+var JSONAPIOperations = require('jsonapi-knex')(db, schemas);
+
+// add your transforms or modify operations here
+
+app.use('/api', JSONAPI(JSONAPIOperations, schemas, '/api'));
+</code></pre>
+
+<p>The <code>lib/db.js</code> file just uses the <code>knexfile.js</code> (a knex convention) to load your database config, like so:</p>
+
+<pre><code>var configs = require('../../knexfile.js')
+var env = process.env.NODE_ENV || 'development'
+var config = configs[env]
+if (!config) throw new Error(`No db config defined for environment ${env}`)
+module.exports = require('knex')(config)
+</code></pre>
+
+<h3>
+<a id="getting-started-guide" class="anchor" href="#getting-started-guide" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Getting started guide:</h3>
+
+<h4>
+<a id="setup" class="anchor" href="#setup" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Setup</h4>
+
+<p>To build an ember application with <code>ember-jsonapi</code>, you'd start with an ember application, either an existing one or one generated with <code>ember init [appname]</code>.</p>
+
+<p>Then, install this addon and initialize the api:</p>
+
+<pre><code>ember install ember-jsonapi
+ember generate api
+</code></pre>
+
+<p>This creates the files needed to run our JSON API server.</p>
+
+<p>The default <code>knexfile.js</code> just uses a sqlite database called <code>dev.sqlite3</code> in the root of our application. If you'd like to connect to a different database, you can modify this file to your will.</p>
+
+<p>Also in the root of the project will be a file called <code>secrets.json</code>. It is very important to avoid adding this file to vcs, and it has automatically been added to <code>.gitignore</code> to help prevent footgun. This is where you can add your database credentials for staging/production environments. To keep things secure, it's recommended that you change the <code>jwt_secret</code> field. Finally, it includes credentials for a seed user that will be created when initializing the database.</p>
+
+<h4>
+<a id="authenticating-a-user" class="anchor" href="#authenticating-a-user" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Authenticating a user</h4>
+
+<p>The api blueprint also creates a knex migration &amp; seed to create our user database that our auth will use. To set up our database, first install knex globally, then run our migrations and seeds:</p>
+
+<pre><code>npm install knex -g
+knex migrate:latest
+knex seed:run
+</code></pre>
+
+<p>We now have a database with a <code>users</code> table, and since the api automatically creates a <code>users</code> schema and model, you can log a user in via the <code>session</code> service.</p>
+
+<p>To make this even simpler, <code>ember-jsonapi</code> provides a blueprint for creating a simple login screen:</p>
+
+<pre><code>ember g login-route
+</code></pre>
+
+<p>Now, you can run your server using <code>npm start</code> or <code>ember serve</code>. If you visit <a href="http://localhost:4200/login">http://localhost:4200/login</a> and enter the credentials in secrets.json, you'll be logged in.</p>
+
+<h4>
+<a id="adding-an-api-endpoint" class="anchor" href="#adding-an-api-endpoint" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Adding an api endpoint</h4>
+
+<p>API endpoints are automatically created based on the existence of schemas, so creating an endpoint is the same task as creating a schema.</p>
+
+<p>This library provides a <code>schema</code> blueprint to make that task trivial. It accepts the same arguments as ember's built in <code>model</code> blueprint, which allows for defining simple types using the command line. Let's create a <code>todo</code> schema, which will in turn create a <code>todo</code> model, and <code>todo</code> endpoints.</p>
+
+<pre><code>$ ember g schema todo text:string done:boolean
+installing schema
+  create app/todo/model.js
+  create app/todo/schema.json
+  create tests/unit/todo/model-test.js
+</code></pre>
+
+<p>Now let's edit our schema to add a user relationship:</p>
+
+<pre><code>{
+  "text": "string",
+  "done": "boolean",
+  "owner": { "type": "users", "relationship": "belongsTo" }
+}
+</code></pre>
+
+<p>We'll need a <code>todos</code> table to back our <code>todo</code> model, so let's create a knex migration for that:</p>
+
+<pre><code>$ knex migrate:make todos-table
+Using environment: development
+Created Migration: /migrations/20160707154931_todos-table.js
+</code></pre>
+
+<p>Now we'll update our migration to create our table to match our schema:</p>
+
+<pre><code>exports.up = function(knex, Promise) {
+  return knex.schema.createTable('todos', table =&gt; {
+    table.increments()
+    table.string('text')
+    table.boolean('done')
+    table.integer('owner_id')
+    table.foreign('owner_id').references('id').inTable('users')
+  })
+};
+
+exports.down = function(knex, Promise) {
+  return knex.schema.dropTable('todos')
+};
+</code></pre>
+
+<p>Finally, let's apply our migration by running <code>knex migrate:latest</code>, and start our server. Now if you visit <a href="http://localhost:4200/api/todos">http://localhost:4200/api/todos</a> you'll see that it returns an (empty) list of todos.</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/jesseditson/ember-jsonapi">ember-jsonapi</a> is maintained by <a href="https://github.com/jesseditson">jesseditson</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
