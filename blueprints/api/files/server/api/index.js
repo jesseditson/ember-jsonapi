@@ -11,20 +11,11 @@ var JSONAPIOperations = require('jsonapi-knex')(db, schemas);
 var JSONAPIOperations = {};
 <% } %>
 
-JSONAPIOperations.sideEffects = {
+JSONAPIOperations.transforms = {
   /**
-   * Add side effects here in the format of:
-  [schemaName]: {
-    [operation]: {
-      query(qb) {
-        // hook to modify the query of an operation
-        return qb
-      },
-      records(records) {
-        // hook to modify the response of an operation
-        return records
-      }
-    }
+   * Add transforms here in the format of:
+  [schemaName]: function(records, req) {
+    return [Promise returning records, or transformed records]
   }
    */
 };

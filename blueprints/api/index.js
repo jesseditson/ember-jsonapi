@@ -14,6 +14,8 @@ module.exports = {
   // allow running without a name
   normalizeEntityName: function() {},
 
+  anonymousOptions: [],
+
   availableOptions: [
     // {
     //   name: 'driver',
@@ -26,8 +28,8 @@ module.exports = {
   addPackagesToProject: addPackagesToProject,
 
   locals: function(options) {
-    var driver = 'knex'; // TODO: support more
-    var includeSessions = true; // TODO: allow turning off
+    var driver = 'knex'; // TODO: support more?
+    var includeSessions = true; // TODO: allow turning off?
 
     return {
       driver: driver,
@@ -42,6 +44,15 @@ module.exports = {
       },
       __service__: function(options){
         return options.pod ? 'service' : 'session';
+      },
+      __application_path__: function(options) {
+        return options.pod ? 'adapter' : 'application';
+      },
+      __models_path__: function(options) {
+        return options.pod ? 'user' : 'models';
+      },
+      __schemas_path__: function(options) {
+        return options.pod ? 'user' : 'schemas';
       }
     }
   },

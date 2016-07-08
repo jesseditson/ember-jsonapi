@@ -62,7 +62,7 @@ module.exports = {
   fileMapTokens: function(options) {
     return {
       __schema__: function(options){
-        return options.pod ? 'schema' : options.locals.schemaName;
+        return options.pod ? 'schema' : options.locals.modelName;
       },
       __model__: function(options) {
         return options.pod ? 'model' : options.locals.modelName;

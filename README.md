@@ -4,4 +4,4 @@ Create automatic, database-backed JSONAPI endpoints based on incredibly simple J
 
 # TODO:
 
-- [] integration tests for models/schemas & api endpoints
+[] integration tests for models/schemas & api endpoints
