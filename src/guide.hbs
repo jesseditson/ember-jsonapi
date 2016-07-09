@@ -1,0 +1,84 @@
+### Getting started guide:
+
+#### Setup
+
+To build an ember application with `ember-jsonapi`, you'd start with an ember application, either an existing one or one generated with `ember init [appname]`.
+
+Then, install this addon and initialize the api:
+
+```
+ember install ember-jsonapi
+ember generate api
+```
+
+This creates the files needed to run our JSON API server.
+
+The default `knexfile.js` just uses a sqlite database called `dev.sqlite3` in the root of our application. If you'd like to connect to a different database, you can modify `knexfile.js`.
+
+Also in the root of the project will be a file called `secrets.json`. It is very important to avoid adding this file to vcs, and it has automatically been added to `.gitignore` to help prevent footgun. This is where you can add your database credentials for staging/production environments. To keep things secure, it's recommended that you change the `jwt_secret` field. Finally, it includes credentials for a seed user that will be created when initializing the database.
+
+#### Authenticating a user
+
+The api blueprint also creates a knex migration & seed to create our user database that our auth will use. To set up our database, first install knex globally, then run our migrations and seeds:
+
+```
+npm install knex -g
+knex migrate:latest
+knex seed:run
+```
+
+We now have a database with a `users` table, and since the api automatically creates a `users` schema and model, you can log a user in via the `session` service.
+
+To make this even simpler, `ember-jsonapi` provides a blueprint for creating a simple login screen:
+
+```
+ember g login
+```
+
+Now, you can run your server using `npm start` or `ember serve`. If you visit [http://localhost:4200/login](http://localhost:4200/login) and enter the credentials in secrets.json, you'll be logged in.
+
+#### Adding an api endpoint
+
+API endpoints are automatically created based on the existence of schemas, so creating an endpoint is the same task as creating a schema.
+
+This library provides a `schema` blueprint to make that task trivial. It accepts the same arguments as ember's built in `model` blueprint, which allows for defining simple types using the command line. Let's create a `todo` schema, which will in turn create a `todo` model, and `todo` endpoints.
+
+```
+ember g schema todo text:string done:boolean
+```
+
+Now let's edit our schema to add a user relationship:
+
+```
+{
+  "text": "string",
+  "done": "boolean",
+  "owner": { "type": "users", "relationship": "belongsTo" }
+}
+```
+
+We'll need a `todos` table to back our `todo` model, so let's create a migration for our schema:
+
+```
+ember g migration todos
+```
+
+This will automatically generate the following migration:
+
+```
+exports.up = function(knex, Promise) {
+  return knex.schema.createTable('todos', table => {
+    table.increments()
+    table.string('text')
+    table.boolean('done')
+    table.integer('owner_id')
+    table.foreign('owner_id').references('id').inTable('users')
+  })
+};
+
+exports.down = function(knex, Promise) {
+  return knex.schema.dropTable('todos')
+};
+```
+
+Finally, let's apply our migration by running `knex migrate:latest`, and start our server. Now if you visit [http://localhost:4200/api/todos](http://localhost:4200/api/todos) you'll see that it returns an (empty) list of todos.

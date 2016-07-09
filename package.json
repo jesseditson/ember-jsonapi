@@ -1,0 +1,31 @@
+{
+  "name": "ember-jsonapi-web",
+  "version": "0.1.0",
+  "description": "Website for ember-jsonapi",
+  "scripts": {
+    "build": "node scripts/build.js && npm run docs",
+    "docs": "rm -rf docs && ./node_modules/.bin/jsdoc --configure .jsdoc.json --verbose",
+    "start": "./node_modules/.bin/http-server & onchange 'src/**/*' -- npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jesseditson/ember-jsonapi.git"
+  },
+  "author": "Jesse Ditson <jesse.ditson@gmail.com>",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/jesseditson/ember-jsonapi/issues"
+  },
+  "homepage": "https://jesseditson.github.io/ember-jsonapi/",
+  "devDependencies": {
+    "ember-jsonapi": "0.0.2",
+    "fs-readdir-recursive": "^1.0.0",
+    "highlight.js": "^9.5.0",
+    "http-server": "^0.9.0",
+    "jsdoc": "^3.4.0",
+    "marked": "^0.3.5",
+    "minami": "^1.1.1",
+    "mkdirp": "^0.5.1",
+    "onchange": "^2.5.0"
+  }
+}

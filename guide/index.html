@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>ember-jsonapi | Guide</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="/stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">ember-jsonapi</h1>
+      <h2 class="project-tagline">Create automatic JSONAPI endpoints based on incredibly simple JSON schemas.</h2>
+      <nav>
+        <a href="/home" class="btn">Home</a>
+        <a href="/modules" class="btn">Modules</a>
+        <a href="/guide" class="btn">Guide</a>
+        <a href="/api" class="btn">API Docs</a>
+        <a href="https://github.com/jesseditson/ember-jsonapi" class="btn">GitHub</a>
+      </nav>
+    </section>
+
+    <section class="main-content">
+      <h3 id="getting-started-guide-">Getting started guide:</h3>
+<h4 id="setup">Setup</h4>
+<p>To build an ember application with <code>ember-jsonapi</code>, you&#39;d start with an ember application, either an existing one or one generated with <code>ember init [appname]</code>.</p>
+<p>Then, install this addon and initialize the api:</p>
+<pre><code>ember install ember-jsonapi
+ember <span class="hljs-keyword">generate</span> api
+</code></pre><p>This creates the files needed to run our JSON API server.</p>
+<p>The default <code>knexfile.js</code> just uses a sqlite database called <code>dev.sqlite3</code> in the root of our application. If you&#39;d like to connect to a different database, you can modify <code>knexfile.js</code>.</p>
+<p>Also in the root of the project will be a file called <code>secrets.json</code>. It is very important to avoid adding this file to vcs, and it has automatically been added to <code>.gitignore</code> to help prevent footgun. This is where you can add your database credentials for staging/production environments. To keep things secure, it&#39;s recommended that you change the <code>jwt_secret</code> field. Finally, it includes credentials for a seed user that will be created when initializing the database.</p>
+<h4 id="authenticating-a-user">Authenticating a user</h4>
+<p>The api blueprint also creates a knex migration &amp; seed to create our user database that our auth will use. To set up our database, first install knex globally, then run our migrations and seeds:</p>
+<pre><code><span class="hljs-selector-tag">npm</span> <span class="hljs-selector-tag">install</span> <span class="hljs-selector-tag">knex</span> <span class="hljs-selector-tag">-g</span>
+<span class="hljs-selector-tag">knex</span> <span class="hljs-selector-tag">migrate</span><span class="hljs-selector-pseudo">:latest</span>
+<span class="hljs-selector-tag">knex</span> <span class="hljs-selector-tag">seed</span><span class="hljs-selector-pseudo">:run</span>
+</code></pre><p>We now have a database with a <code>users</code> table, and since the api automatically creates a <code>users</code> schema and model, you can log a user in via the <code>session</code> service.</p>
+<p>To make this even simpler, <code>ember-jsonapi</code> provides a blueprint for creating a simple login screen:</p>
+<pre><code><span class="hljs-attribute">ember</span> g login
+</code></pre><p>Now, you can run your server using <code>npm start</code> or <code>ember serve</code>. If you visit <a href="http://localhost:4200/login">http://localhost:4200/login</a> and enter the credentials in secrets.json, you&#39;ll be logged in.</p>
+<h4 id="adding-an-api-endpoint">Adding an api endpoint</h4>
+<p>API endpoints are automatically created based on the existence of schemas, so creating an endpoint is the same task as creating a schema.</p>
+<p>This library provides a <code>schema</code> blueprint to make that task trivial. It accepts the same arguments as ember&#39;s built in <code>model</code> blueprint, which allows for defining simple types using the command line. Let&#39;s create a <code>todo</code> schema, which will in turn create a <code>todo</code> model, and <code>todo</code> endpoints.</p>
+<pre><code>ember g schema todo <span class="hljs-built_in">text</span>:<span class="hljs-built_in">string</span> done:<span class="hljs-built_in">boolean</span>
+</code></pre><p>Now let&#39;s edit our schema to add a user relationship:</p>
+<pre><code>{
+  <span class="hljs-attr">"text"</span>: <span class="hljs-string">"string"</span>,
+  <span class="hljs-attr">"done"</span>: <span class="hljs-string">"boolean"</span>,
+  <span class="hljs-attr">"owner"</span>: { <span class="hljs-attr">"type"</span>: <span class="hljs-string">"users"</span>, <span class="hljs-attr">"relationship"</span>: <span class="hljs-string">"belongsTo"</span> }
+}
+</code></pre><p>We&#39;ll need a <code>todos</code> table to back our <code>todo</code> model, so let&#39;s create a migration for our schema:</p>
+<pre><code><span class="hljs-attribute">ember</span> g migration todos
+</code></pre><p>This will automatically generate the following migration:</p>
+<pre><code>exports.up = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(knex, Promise)</span></span> {
+  <span class="hljs-keyword">return</span> knex.schema.createTable(<span class="hljs-string">'todos'</span>, <span class="hljs-built_in">table</span> =&gt; {
+    <span class="hljs-built_in">table</span>.increments()
+    <span class="hljs-built_in">table</span>.<span class="hljs-built_in">string</span>(<span class="hljs-string">'text'</span>)
+    <span class="hljs-built_in">table</span>.boolean(<span class="hljs-string">'done'</span>)
+    <span class="hljs-built_in">table</span>.integer(<span class="hljs-string">'owner_id'</span>)
+    <span class="hljs-built_in">table</span>.foreign(<span class="hljs-string">'owner_id'</span>).references(<span class="hljs-string">'id'</span>).inTable(<span class="hljs-string">'users'</span>)
+  })
+};
+
+exports.down = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(knex, Promise)</span></span> {
+  <span class="hljs-keyword">return</span> knex.schema.dropTable(<span class="hljs-string">'todos'</span>)
+};
+</code></pre><p>Finally, let&#39;s apply our migration by running <code>knex migrate:latest</code>, and start our server. Now if you visit <a href="http://localhost:4200/api/todos">http://localhost:4200/api/todos</a> you&#39;ll see that it returns an (empty) list of todos.</p>
+
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/jesseditson/ember-jsonapi">ember-jsonapi</a> is maintained by <a href="https://github.com/jesseditson">jesseditson</a>.</span>
+      </footer>
+
+    </section>
+
+
+  </body>
+</html>

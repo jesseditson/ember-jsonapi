@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>jsonapi-express/examples/operations.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-jsonapi-express_operations.html">jsonapi-express/operations</a><ul class='methods'><li data-type='method'><a href="module-jsonapi-express_operations.html#.authorize">authorize</a></li><li data-type='method'><a href="module-jsonapi-express_operations.html#.create">create</a></li><li data-type='method'><a href="module-jsonapi-express_operations.html#.delete">delete</a></li><li data-type='method'><a href="module-jsonapi-express_operations.html#.findAll">findAll</a></li><li data-type='method'><a href="module-jsonapi-express_operations.html#.findOne">findOne</a></li><li data-type='method'><a href="module-jsonapi-express_operations.html#.update">update</a></li><li data-type='method'><a href="module-jsonapi-express_operations.html#.updateRelationship">updateRelationship</a></li></ul></li><li><a href="module-jsonapi-knex.html">jsonapi-knex</a></li><li><a href="module-jsonapi-schema.html">jsonapi-schema</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">jsonapi-express/examples/operations.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/** @module jsonapi-express/operations */
+
+/**
+ * Operations
+ *
+ * These operations are requested by the JSONAPI routes as necessary to compile data for their endpoints.
+ * Each of them returns a Promise, which can be a native JS promise or any spec compatible one.
+ *
+ * Many of these operations return "data objects", which are shallow objects that will be transformed to JSONAPI compatible documents.
+ * These shallow documents should contain all of the fields defined in the corresponding schema, along with an `id` field.
+ * If a schema property defines a `belongsTo` relationship, it is expected that the either the document or it's relationship defines a &lt;property>_id key.
+ * If a schema property defines a `hasMany` relationship, it is expected that the associated object defines a &lt;property>_id key.
+ * hasMany relationships can define `through` relationships, which must be defined as schemas.
+ */
+
+/**
+ * authorize - authorization middleware
+ */
+module.exports.authorize = function (req, res, next) {
+  next()
+}
+
+/**
+ * findAll - return an array of objects matching the type and filter, returning only the fields specified.
+ *
+ * @param  {string} type          The plural name of the schema to fetch
+ * @param  {array|string} fields  The fields to return. Either '*' or an array of field names
+ * @param  {object} filter        Filtering criteria. Contains a `query` and a `params` object, both of which are POJOs constructed from the API request
+ * @return {Promise}              A promise that resolves with an object containing data (and optionally relationships)
+ */
+module.exports.findAll = function(type, fields, filter) {
+  return new Promise((resolve, reject) => {
+    // resolve({ data: [], related: [] })
+  })
+}
+
+/**
+ * findOne - return a single object matching the type and filter, returning only the fields specified.
+ *
+ * @param  {string} type          The plural name of the schema to fetch
+ * @param  {array|string} fields  The fields to return. Either '*' or an array of field names
+ * @param  {object} filter        Filtering criteria. Contains a `query` and a `params` object, both of which are POJOs constructed from the API request
+ * @return {Promise}              A promise that resolves with an object containing data (and optionally relationships)
+ */
+module.exports.findOne = function(type, fields, filter) {
+  return new Promise((resolve, reject) => {
+    // resolve({ data: {}, related: [] })
+  })
+}
+
+/**
+ * create - create and return a new record
+ * Note that this method is also expected to create relationships if specified, as per the JSONAPI spec.
+ * The returned data is expected to be a promise returning the created object
+ *
+ * @param  {string} type      The type of object to create
+ * @param  {object} data      A JSONAPI compatible object, including relationships
+ * @return {Promise}          A promise that resolves with an object containing data (and optionally relationships)
+ */
+module.exports.create = function(type, data) {
+  return new Promise((resolve, reject) => {
+    // resolve({ data: {}, related: [] })
+  })
+}
+
+/**
+ * update - update an existing record
+ *
+ * @param  {string} type      The type of object to update
+ * @param  {number} id        The id of the object to update
+ * @param  {object} data      A JSONAPI compatible update object
+ * @return {Promise}          A promise that resolves with an object containing the updated object
+ */
+module.exports.update = function(type, id, data) {
+  return new Promise((resolve, reject) => {
+    // resolve({ data: {}, related: [] })
+  })
+}
+
+/**
+ * delete - delete a record of type with the specified id
+ *
+ * @param  {string} type        The plural name of the schema to delete from
+ * @param  {number} id          The ID to delete
+ * @return {Promise}            A promise that resolves when the item has been deleted
+ */
+module.exports.delete = function(type, id) {
+  return new Promise((resolve, reject) => {
+    // resolve()
+  })
+}
+
+/**
+ * updateRelationship - Update a relationship between two records
+ * To properly understand this method, you'll want to familiarize yourself with the appropriate section of the JSONAPI spec:
+ * http://jsonapi.org/format/#crud-updating-relationships
+ *
+ * @param  {string} relationship The type of relationship, either "hasMany" or "belongsTo"
+ * @param  {object} record       Record information, containing the following keys:
+ *                               {string} operation  The operation to perform (create, update, delete)
+ *                               {string} name       The (plural) schema name
+ *                               {number} id         The ID of the relationship to update
+ *                               {string} type       The type of the relationship schema
+ * @param  {object} data         Raw object data from the client to update with (see JSONAPI spec)
+ * @return {Promise}             A promise either returning `null` if the relationship(s) already existed (or did not exist), or a relationship object if a relationship was created.
+ */
+module.exports.updateRelationship = function(relationship, record, data) {
+  return new Promise((resolve, reject) => {
+    // resolve(null | {})
+  })
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Fri Jul 08 2016 20:09:33 GMT-0700 (PDT) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

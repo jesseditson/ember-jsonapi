@@ -1,0 +1,27 @@
+{
+    "tags": {
+        "allowUnknownTags": true,
+        "dictionaries": ["jsdoc"]
+    },
+    "source": {
+        "include": [
+          "./node_modules/jsonapi-knex",
+          "./node_modules/jsonapi-express",
+          "./node_modules/jsonapi-schema"
+        ],
+        "includePattern": ".js$",
+        "excludePattern": "(node_modules/.+/node_modules|docs)"
+    },
+    "templates": {
+        "cleverLinks": false,
+        "monospaceLinks": true
+    },
+    "opts": {
+        "destination": "./docs/",
+        "encoding": "utf8",
+        "private": true,
+        "recurse": true,
+        "access": "public,undefined",
+        "template": "./node_modules/minami"
+    }
+}
