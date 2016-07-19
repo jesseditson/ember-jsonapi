@@ -5,6 +5,7 @@ var path = require('path')
 var readdir = require('fs-readdir-recursive')
 var mkdirp = require('mkdirp')
 var marked = require('marked')
+var pkg = require('../package.json')
 
 marked.setOptions({
   highlight: function (code) {
@@ -41,6 +42,8 @@ paths.forEach(function(p) {
     var destPath = path.join(destDir, p)
     mkdirp.sync(destPath)
   }
+  // base path on gh-pages will be the same as the package name
+  config.basePath = '/' + pkg.name
   config.body = marked(Handlebars.compile(templates[p])(config))
   config.title = titleCase(p)
   var out = Handlebars.compile(layout)(config)

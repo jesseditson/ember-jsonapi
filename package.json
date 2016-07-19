@@ -5,7 +5,7 @@
   "scripts": {
     "build": "node scripts/build.js && npm run docs",
     "docs": "rm -rf docs && ./node_modules/.bin/jsdoc --configure .jsdoc.json --verbose",
-    "start": "./node_modules/.bin/http-server & onchange 'src/**/*' -- npm run build"
+    "start": "http-server -b /ember-jsonapi -o & onchange 'src/**/*' -- npm run build"
   },
   "repository": {
     "type": "git",
