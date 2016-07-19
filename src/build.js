@@ -13,14 +13,14 @@ marked.setOptions({
   }
 })
 
-var paths = ['index', 'modules', 'guide']
-var layout = fs.readFileSync(__dirname + '/../src/layouts/layout.hbs', 'utf8')
+var paths = ['modules', 'guide']
 var templates = paths.reduce(function(o, path) {
-  o[path] = fs.readFileSync(__dirname + '/../src/' + path + '.hbs', 'utf8')
+  var fullPath = __dirname + '/' + path
+  o[path] = { content: fs.readFileSync(fullPath + '.hbs', 'utf8'), path: fullPath }
   return o
 }, {})
 
-var partialsDir = __dirname + '/../src/partials/'
+var partialsDir = __dirname + '/partials/'
 var partials = readdir(partialsDir).filter(f => /\.hbs$/.test(f)).forEach(f => {
   var folder = f.replace(path.basename(f), '')
   var name = folder + path.basename(f, '.hbs')
@@ -33,19 +33,15 @@ function titleCase(str) {
   return str.slice(0, 1).toUpperCase() + str.slice(1)
 }
 
-var destDir = process.cwd()
+var destDir = path.join(process.cwd(), 'dist', 'tutorials')
+mkdirp.sync(destDir)
 var config = {}
 paths.forEach(function(p) {
   delete config.body
+  var t = templates[p]
   var destPath = destDir
-  if (p !== 'index') {
-    var destPath = path.join(destDir, p)
-    mkdirp.sync(destPath)
-  }
   // base path on gh-pages will be the same as the package name
   config.basePath = '/' + pkg.name
-  config.body = marked(Handlebars.compile(templates[p])(config))
-  config.title = titleCase(p)
-  var out = Handlebars.compile(layout)(config)
-  fs.writeFileSync(path.join(destPath, 'index.html'), out, 'utf8')
+  var out = config.body = marked(Handlebars.compile(t.content)(config))
+  fs.writeFileSync(path.join(destPath, p + '.html'), out, 'utf8')
 })

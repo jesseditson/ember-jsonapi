@@ -1,3 +1,5 @@
+# ember-json
+
 ### introduction
 
 ember-jsonapi is an ember-cli addon for creating automatic [JSON API](http://jsonapi.org/) endpoints based on shared schemas written in JSON.

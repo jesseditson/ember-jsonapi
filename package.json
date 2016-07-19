@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "Website for ember-jsonapi",
   "scripts": {
-    "build": "node scripts/build.js && npm run docs",
-    "docs": "rm -rf docs && ./node_modules/.bin/jsdoc --configure .jsdoc.json --verbose",
+    "build": "node scripts/build.js && npm run docs && rm -rf dist",
+    "docs": "rm -rf docs && jsdoc --configure .jsdoc.json --verbose",
     "start": "http-server -b /ember-jsonapi -o & onchange 'src/**/*' -- npm run build"
   },
   "repository": {

@@ -17,11 +17,13 @@
         "monospaceLinks": true
     },
     "opts": {
-        "destination": "./docs/",
+        "destination": ".",
         "encoding": "utf8",
         "private": true,
         "recurse": true,
         "access": "public,undefined",
+        "tutorials": "dist/tutorials",
+        "readme": "./src/README.md",
         "template": "./node_modules/minami"
     }
 }
