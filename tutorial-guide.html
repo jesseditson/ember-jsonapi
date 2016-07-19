@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Tutorial: guide - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-jsonapi-express_operations.html">jsonapi-express/operations</a><ul class='methods'><li data-type='method'><a href="module-jsonapi-express_operations.html#.authorize">authorize</a></li><li data-type='method'><a href="module-jsonapi-express_operations.html#.create">create</a></li><li data-type='method'><a href="module-jsonapi-express_operations.html#.delete">delete</a></li><li data-type='method'><a href="module-jsonapi-express_operations.html#.findAll">findAll</a></li><li data-type='method'><a href="module-jsonapi-express_operations.html#.findOne">findOne</a></li><li data-type='method'><a href="module-jsonapi-express_operations.html#.update">update</a></li><li data-type='method'><a href="module-jsonapi-express_operations.html#.updateRelationship">updateRelationship</a></li></ul></li><li><a href="module-jsonapi-knex.html">jsonapi-knex</a></li><li><a href="module-jsonapi-schema.html">jsonapi-schema</a></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-guide.html">guide</a></li><li><a href="tutorial-modules.html">modules</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Tutorial: guide</h1>
+    
+
+    <section>
+
+<header>
+    
+
+    <h2>guide</h2>
+</header>
+
+<article>
+    <h4 id="setup">Setup</h4>
+<p>To build an ember application with <code>ember-jsonapi</code>, you&#39;d start with an ember application, either an existing one or one generated with <code>ember init [appname]</code>.</p>
+<p>Then, install this addon and initialize the api:</p>
+<pre><code>ember install ember-jsonapi
+ember <span class="hljs-keyword">generate</span> api
+</code></pre><p>This creates the files needed to run our JSON API server.</p>
+<p>The default <code>knexfile.js</code> just uses a sqlite database called <code>dev.sqlite3</code> in the root of our application. If you&#39;d like to connect to a different database, you can modify <code>knexfile.js</code>.</p>
+<p>Also in the root of the project will be a file called <code>secrets.json</code>. It is very important to avoid adding this file to vcs, and it has automatically been added to <code>.gitignore</code> to help prevent footgun. This is where you can add your database credentials for staging/production environments. To keep things secure, it&#39;s recommended that you change the <code>jwt_secret</code> field. Finally, it includes credentials for a seed user that will be created when initializing the database.</p>
+<h4 id="authenticating-a-user">Authenticating a user</h4>
+<p>The api blueprint also creates a knex migration &amp; seed to create our user database that our auth will use. To set up our database, first install knex globally, then run our migrations and seeds:</p>
+<pre><code><span class="hljs-selector-tag">npm</span> <span class="hljs-selector-tag">install</span> <span class="hljs-selector-tag">knex</span> <span class="hljs-selector-tag">-g</span>
+<span class="hljs-selector-tag">knex</span> <span class="hljs-selector-tag">migrate</span><span class="hljs-selector-pseudo">:latest</span>
+<span class="hljs-selector-tag">knex</span> <span class="hljs-selector-tag">seed</span><span class="hljs-selector-pseudo">:run</span>
+</code></pre><p>We now have a database with a <code>users</code> table, and since the api automatically creates a <code>users</code> schema and model, you can log a user in via the <code>session</code> service.</p>
+<p>To make this even simpler, <code>ember-jsonapi</code> provides a blueprint for creating a simple login screen:</p>
+<pre><code><span class="hljs-attribute">ember</span> g login
+</code></pre><p>Now, you can run your server using <code>npm start</code> or <code>ember serve</code>. If you visit <a href="http://localhost:4200/login">http://localhost:4200/login</a> and enter the credentials in secrets.json, you&#39;ll be logged in.</p>
+<h4 id="adding-an-api-endpoint">Adding an api endpoint</h4>
+<p>API endpoints are automatically created based on the existence of schemas, so creating an endpoint is the same task as creating a schema.</p>
+<p>This library provides a <code>schema</code> blueprint to make that task trivial. It accepts the same arguments as ember&#39;s built in <code>model</code> blueprint, which allows for defining simple types using the command line. Let&#39;s create a <code>todo</code> schema, which will in turn create a <code>todo</code> model, and <code>todo</code> endpoints.</p>
+<pre><code>ember g schema todo <span class="hljs-built_in">text</span>:<span class="hljs-built_in">string</span> done:<span class="hljs-built_in">boolean</span>
+</code></pre><p>Now let&#39;s edit our schema to add a user relationship:</p>
+<pre><code>{
+  <span class="hljs-attr">"text"</span>: <span class="hljs-string">"string"</span>,
+  <span class="hljs-attr">"done"</span>: <span class="hljs-string">"boolean"</span>,
+  <span class="hljs-attr">"owner"</span>: { <span class="hljs-attr">"type"</span>: <span class="hljs-string">"users"</span>, <span class="hljs-attr">"relationship"</span>: <span class="hljs-string">"belongsTo"</span> }
+}
+</code></pre><p>We&#39;ll need a <code>todos</code> table to back our <code>todo</code> model, so let&#39;s create a migration for our schema:</p>
+<pre><code><span class="hljs-attribute">ember</span> g migration todos
+</code></pre><p>This will automatically generate the following migration:</p>
+<pre><code>exports.up = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(knex, Promise)</span></span> {
+  <span class="hljs-keyword">return</span> knex.schema.createTable(<span class="hljs-string">'todos'</span>, <span class="hljs-built_in">table</span> =&gt; {
+    <span class="hljs-built_in">table</span>.increments()
+    <span class="hljs-built_in">table</span>.<span class="hljs-built_in">string</span>(<span class="hljs-string">'text'</span>)
+    <span class="hljs-built_in">table</span>.boolean(<span class="hljs-string">'done'</span>)
+    <span class="hljs-built_in">table</span>.integer(<span class="hljs-string">'owner_id'</span>)
+    <span class="hljs-built_in">table</span>.foreign(<span class="hljs-string">'owner_id'</span>).references(<span class="hljs-string">'id'</span>).inTable(<span class="hljs-string">'users'</span>)
+  })
+};
+
+exports.down = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(knex, Promise)</span></span> {
+  <span class="hljs-keyword">return</span> knex.schema.dropTable(<span class="hljs-string">'todos'</span>)
+};
+</code></pre><p>Finally, let&#39;s apply our migration by running <code>knex migrate:latest</code>, and start our server. Now if you visit <a href="http://localhost:4200/api/todos">http://localhost:4200/api/todos</a> you&#39;ll see that it returns an (empty) list of todos.</p>
+
+</article>
+
+</section>
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Mon Jul 18 2016 22:23:26 GMT-0700 (PDT) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

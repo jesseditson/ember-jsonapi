@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>jsonapi-schema/index.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-jsonapi-express_operations.html">jsonapi-express/operations</a><ul class='methods'><li data-type='method'><a href="module-jsonapi-express_operations.html#.authorize">authorize</a></li><li data-type='method'><a href="module-jsonapi-express_operations.html#.create">create</a></li><li data-type='method'><a href="module-jsonapi-express_operations.html#.delete">delete</a></li><li data-type='method'><a href="module-jsonapi-express_operations.html#.findAll">findAll</a></li><li data-type='method'><a href="module-jsonapi-express_operations.html#.findOne">findOne</a></li><li data-type='method'><a href="module-jsonapi-express_operations.html#.update">update</a></li><li data-type='method'><a href="module-jsonapi-express_operations.html#.updateRelationship">updateRelationship</a></li></ul></li><li><a href="module-jsonapi-knex.html">jsonapi-knex</a></li><li><a href="module-jsonapi-schema.html">jsonapi-schema</a></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-guide.html">guide</a></li><li><a href="tutorial-modules.html">modules</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">jsonapi-schema/index.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/** @module jsonapi-schema */
+var path = require('path')
+var pluralize = require('pluralize')
+var loadSchemas = require('./lib/loadSchemas')
+
+/**
+ * JSONAPI
+ * Initialize a parser generator with a dictionary of schemas and a base URL.
+ *
+ * @public
+ * @param  {object} schemas  A dictionary of schemas that will be available at this endpoint
+ * @param  {string} baseURL  A path to prepend to link URLs
+ * @return {JSONAPIParser}   A JSONAPIParser function for creating a parse method
+ */
+module.exports = function JSONAPI(schemas, baseURL) {
+  if (!schemas) throw new Error('You must provide a schema hash when instantiating JSONAPI.')
+  /**
+   * JSONAPIParser
+   * call with a schema type to create a toJSONAPI function
+   *
+   * @public
+   * @typedef {function} JSONAPIParser
+   * @param {string} type      The name of the schema to parse JSON into
+   * @return {toJSONAPI}       A JSONAPIParser function for creating a parse method
+   */
+  return function JSONAPIParser(type) {
+    var schema = schemas[type]
+    if (!schema) throw new Error(`No schema found for type ${type}.`)
+    /**
+     * toJSONAPI
+     * Serialize an object to a JSONAPI-compatible response
+     *
+     * @public
+     * @typedef {function} toJSONAPI
+     * @param  {object} obj      Either a single object, or an array of flat objects from the database
+     * @param  {object} info     Additional info to build the response with. Can contain the following keys:
+     * - [included]    name:data pairs of flat objects from the databases to include in the response (if part of a relationship)
+     * - [links]       Additional links to append to the `links` key
+     * - [defaults]    Default key-value pairs to append to every returned item
+     * @return {object}        A JSONAPI-compatible object to send back to the client
+     */
+    return function toJSONAPI(obj, info) {
+      info = info || {}
+      if (!info.links) info.links = {}
+      baseURL = baseURL || ''
+      var defaults = info.defaults
+      var resp = {
+        links: Object.assign(info.links, {
+          self: path.join(baseURL, info.links.self || type)
+        }),
+        data: applyTransform(obj, i => {
+          var item = toJSONAPIData(type, i, schema, baseURL)
+          var relationships = getRelationships(type, item, info.included, schemas, baseURL, defaults)
+          if (Object.keys(relationships).length) item.relationships = relationships
+          return item
+        })
+      }
+      if (info.links.related) {
+        resp.links.related = path.join(baseURL, info.links.related)
+      }
+      if (info.included) {
+        resp.included = Object.keys(info.included).map(type => {
+          return applyTransform(info.included[type], i => {
+            var item = toJSONAPIData(type, i, schemas[type], baseURL)
+            var relationships = getRelationships(type, item, info.included, schemas, baseURL, defaults)
+            if (Object.keys(relationships).length) item.relationships = relationships
+            return item
+          })
+        }).reduce((a, items) => a.concat(items), [])
+      }
+      if (info.meta) resp.meta = info.meta
+      return resp
+    }
+  }
+}
+
+/**
+ * loadSchemas
+ * load schema files from a folder and return a dictionary of schemas
+ *
+ * @type {function}
+ * @public
+ * @static
+ * @param {string} schemasFolder   A path to a folder to load schemas from
+ * @return {object}                A dictionary of schemas
+ */
+module.exports.loadSchemas = loadSchemas
+
+function applyTransform(obj, transform) {
+  if (Array.isArray(obj)) {
+    return obj.map(transform)
+  } else {
+    return transform(obj)
+  }
+}
+
+function getRelationships(type, parent, included, schemas, baseURL, defaults) {
+  var schema = schemas[type]
+  if (!schema) throw new Error(`You included a ${type} object but no schema for it was found.`)
+  return Object.keys(schema).reduce((o, p) => {
+    var property = schema[p]
+    if (property &amp;&amp; property.relationship) {
+      o[p] = {
+        links: {
+          self: path.join(baseURL, parent.type, String(parent.id), 'relationships', p),
+          related: path.join(baseURL, parent.type, String(parent.id), p)
+        }
+      }
+      if (property.relationship === 'belongsTo') {
+        var idKey = property.foreignKey || `${p}_id`
+        var attributes = parent.attributes || {}
+        if (defaults) {
+          for (var d in defaults) {
+            if (attributes[d]) attributes[d] = defaults[d]
+          }
+        }
+        var itemId = attributes[idKey]
+        if (itemId) o[p].data = toJSONAPIData(property.type, { id: itemId }, null, baseURL, true)
+      } else if (property.relationship === 'hasMany' &amp;&amp; included &amp;&amp; included[property.type]) {
+        var includeType = property.type
+        var foreignKey = property.foreignKey || `${pluralize(type, 1)}_id`
+        if (property.through) {
+          var throughSchema = schemas[property.through]
+          var throughKey = property.foreignKey || `${pluralize(p, 1)}`
+          if (!throughSchema[throughKey]) throw new Error(`${type} specified a ${p} relationship through the ${property.through} table, but the ${property.through} schema does not define a ${throughKey} property.`)
+          if (!throughSchema[throughKey].type) throw new Error(`${type} specified a ${p} relationship through the ${property.through} table, but the ${throughKey} property does not define a valid type.`)
+          includeType = throughSchema[throughKey].type
+        }
+        var items = included[includeType].filter(i => {
+          return i[foreignKey] === parent.id
+        })
+        o[p].data = applyTransform(items, i => {
+          return toJSONAPIData(property.type, { id: i.id }, null, baseURL, true)
+        })
+      }
+    }
+    return o
+  }, {})
+}
+
+function toJSONAPIData(type, obj, schema, baseURL, sparse) {
+  if (!obj) return null
+  var resp = {
+    type: type,
+    id: obj.id
+  }
+  if (!sparse) {
+    resp.links = {
+      self: `${baseURL}/${type}/${obj.id}`
+    }
+    var atts = Object.keys(obj).filter(k => k !== 'id')
+    if (atts.length) {
+      resp.attributes = atts.reduce((o, k) => {
+        o[k] = obj[k]
+        return o
+      }, {})
+    }
+  }
+  return resp
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Mon Jul 18 2016 22:23:26 GMT-0700 (PDT) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
