@@ -92,5 +92,17 @@ module.exports = {
       var schemaName = this.schemaName();
       throw new SilentError(`Schema for ${schemaName} not found.`);
     }
+  },
+
+  afterUninstall(options) {
+    // Manually remove migration since the name is not static
+    var mp = this.migrationsPath();
+    var files = fs.readdirSync(mp);
+    var filePattern = new RegExp(`^\\d+_${this.schemaName()}\\.js$`);
+    var fileName = files.find(f => filePattern.test(f));
+    var file = path.join(mp, fileName);
+    if (fs.existsSync(file)) {
+      fs.unlinkSync(file);
+    }
   }
 };
