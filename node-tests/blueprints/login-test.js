@@ -11,7 +11,7 @@ var chai = require('ember-cli-blueprint-test-helpers/chai');
 var expect = chai.expect;
 var file = chai.file;
 
-describe('Acceptance: ember generate and destroy login', function() {
+describe('Acceptance: ember generate login', function() {
   setupTestHooks(this);
 
   it('login files (legacy)', function() {

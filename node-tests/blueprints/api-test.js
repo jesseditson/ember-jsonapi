@@ -10,7 +10,7 @@ var chai = require('ember-cli-blueprint-test-helpers/chai');
 var expect = chai.expect;
 var file = chai.file;
 
-describe('Acceptance: ember generate and destroy api', function() {
+describe('Acceptance: ember generate api', function() {
   setupTestHooks(this);
 
   it('api files (legacy)', function() {
@@ -59,6 +59,20 @@ describe('Acceptance: ember generate and destroy api', function() {
         expect(file('server/api/auth.js')).to.exist;
         expect(file('migrations/000000_users.js')).to.exist;
         expect(file('tests/unit/user/model-test.js')).to.exist;
+    });
+  });
+
+  it('installs scripts', function() {
+    var args = ['api'];
+
+    return emberNew()
+      .then(() => emberGenerate(args))
+      .then(() => {
+        var pkg = JSON.parse(file('package.json').content)
+        expect(pkg).to.include.keys('scripts');
+        expect(pkg.scripts.migrate).to.exist;
+        expect(pkg.scripts.rollback).to.exist;
+        expect(pkg.scripts.seed).to.exist;
     });
   });
 

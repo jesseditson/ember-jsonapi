@@ -24,6 +24,7 @@ describe('Acceptance: ember generate and destroy schema', function() {
         var test = file('tests/unit/models/taco-test.js');
         expect(test).to.contain("moduleForModel('taco', 'Unit | Model | taco', {");
         expect(test).to.contain("const taco = this.subject({});");
+        expect(test).to.contain("assert.ok(!!taco);");
     }));
   });
 

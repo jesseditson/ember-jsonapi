@@ -26,6 +26,8 @@ module.exports = {
     // }
   ],
 
+  addProductionPackagesToProject: addProductionPackagesToProject,
+
   locals: function(options) {
     var driver = 'knex'; // TODO: support more?
     var includeSessions = true; // TODO: allow turning off?
@@ -91,12 +93,12 @@ module.exports = {
     installIfMissing(this, 'morgan', '^1.7.0');
     installIfMissing(this, 'express', '^4.14.0');
 
-    installIfMissing(this, 'jsonapi-express', '^0.1.0');
-    installIfMissing(this, 'jsonapi-schema', '^0.1.0');
+    installIfMissing(this, 'jsonapi-express');
+    installIfMissing(this, 'jsonapi-schema');
 
     var hasSecrets = false
     if (locals.driver === 'knex') {
-      installIfMissing(this, 'jsonapi-knex', '^0.0.2');
+      installIfMissing(this, 'jsonapi-knex');
       installIfMissing(this, 'knex', '^0.11.5');
       installIfMissing(this, 'pg', '^5.1.0');
       installIfMissing(this, 'sqlite3', '^3.1.4', true);
@@ -123,7 +125,7 @@ module.exports = {
 
     if (!options.dryRun && (libsToInstall.length || libsToInstallDev.length)) {
       return Promise.all([
-        addProductionPackagesToProject.call(this, libsToInstall, true),
+        this.addProductionPackagesToProject(libsToInstall, true),
         this.addPackagesToProject(libsToInstallDev),
         this.insertIntoFile('.gitignore', ignores.join('\n'))
       ]);
