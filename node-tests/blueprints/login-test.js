@@ -2,38 +2,42 @@
 var Promise = require('rsvp');
 
 var blueprintHelpers = require('ember-cli-blueprint-test-helpers/helpers');
-var requireFromCLI = require('ember-cli-blueprint-test-helpers/lib/helpers/require-from-cli');
 var setupTestHooks = blueprintHelpers.setupTestHooks;
+var setupPodConfig = blueprintHelpers.setupPodConfig;
 var emberNew = blueprintHelpers.emberNew;
 var emberGenerate = blueprintHelpers.emberGenerate;
 
-var expect = require('ember-cli-blueprint-test-helpers/chai').expect;
+var chai = require('ember-cli-blueprint-test-helpers/chai');
+var expect = chai.expect;
+var file = chai.file;
 
-describe.only('Acceptance: ember generate and destroy login', function() {
-  // We have to override this because otherwise taskFor is completely overridden here:
-  // https://github.com/ember-cli/ember-cli-internal-test-helpers/blob/master/lib/helpers/disable-npm-on-blueprint.js
-  // TODO: Should probably migrate this to the ember-cli-internal-test-helpers repo
-  // var Blueprint = requireFromCLI('lib/models/blueprint');
-  // var taskFor = Blueprint.prototype.taskFor;
-  // beforeEach(function() {
-  //   Blueprint.prototype.taskFor = function(taskName) {
-  //     if (taskName === 'npm-install') {
-  //       return { run: () => Promise.resolve() }
-  //     } else {
-  //       return taskFor.apply(this, arguments);
-  //     }
-  //   };
-  // });
-  //
-  // afterEach(function() {
-  //   Blueprint.prototype.taskFor = taskFor;
-  // });
+describe('Acceptance: ember generate and destroy login', function() {
   setupTestHooks(this);
 
   it('login files (legacy)', function() {
     var args = ['login'];
 
     return emberNew()
-      .then(() => emberGenerate(args));
+      .then(() => emberGenerate(args))
+      .then(() => {
+        expect(file('app/controllers/login.js')).to.exist;
+        expect(file('app/routes/login.js')).to.exist;
+        expect(file('app/templates/login.hbs')).to.exist;
+        expect(file('tests/unit/controllers/login-test.js')).to.exist;
+      })
+  });
+
+  it('login files (pods)', function() {
+    var args = ['login'];
+
+    return emberNew()
+      .then(() => setupPodConfig({ usePods: true }))
+      .then(() => emberGenerate(args))
+      .then(() => {
+        expect(file('app/login/controller.js')).to.exist;
+        expect(file('app/login/route.js')).to.exist;
+        expect(file('app/login/template.hbs')).to.exist;
+        expect(file('tests/unit/login/controller-test.js')).to.exist;
+      })
   });
 });

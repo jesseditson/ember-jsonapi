@@ -13,25 +13,24 @@ module.exports = {
 
   fileMapTokens: function(options) {
     return {
+      __route__: function(options){
+        return options.pod ? 'route' : 'login';
+      },
       __controller__: function(options){
         return options.pod ? 'controller' : 'login';
       },
       __template__: function(options) {
         return options.pod ? 'template' : 'login';
+      },
+      __controller_path__: function(options) {
+        return options.pod ? 'login' : 'controllers';
+      },
+      __route_path__: function(options) {
+        return options.pod ? 'login' : 'routes';
+      },
+      __template_path__: function(options) {
+        return options.pod ? 'login' : 'templates';
       }
     }
-  },
-  // TODO: would be nice if we could just call parent blueprints, but that seems like it's not gonna work right now.
-  // Instead, we just create the same stuff by copying files.
-  // beforeInstall: function(options) {
-    // var task = this.taskFor('generate-from-blueprint', {
-    //   ui:         this.ui,
-    //   analytics:  this.analytics,
-    //   project:    this.project,
-    //   testing:    this.testing
-    // });
-    // return Promise.all([
-    //   task.run({ args: ['route', 'login'] })
-    // ]);
-  // }
+  }
 };

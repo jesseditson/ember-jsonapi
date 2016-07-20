@@ -9,7 +9,7 @@ export default Ember.Controller.extend({
       this.get('session')
         .login(this.get('email'), this.get('password'))
         .then(() => {
-          this.transitionToRoute('bracket')
+          this.transitionToRoute('index')
         }, err => {
           this.set('error', err)
         })
