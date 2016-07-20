@@ -6,7 +6,7 @@ var stringUtils = require('ember-cli-string-utils');
 var isPackageMissing = require('ember-cli-is-package-missing');
 // TODO: add validation, use this to throw when options are wrong
 // var SilentError = require('silent-error');
-var addPackagesToProject = require('../../lib/addPackagesToProject');
+var addProductionPackagesToProject = require('../../lib/addProductionPackagesToProject');
 
 module.exports = {
   description: 'Adds an API layer to the express router, using a specified JSONAPIOperations module.',
@@ -24,8 +24,6 @@ module.exports = {
     //   default: 'knex'
     // }
   ],
-
-  addPackagesToProject: addPackagesToProject,
 
   locals: function(options) {
     var driver = 'knex'; // TODO: support more?
@@ -118,7 +116,7 @@ module.exports = {
 
     if (!options.dryRun && (libsToInstall.length || libsToInstallDev.length)) {
       return Promise.all([
-        this.addPackagesToProject(libsToInstall, true),
+        addProductionPackagesToProject.call(this, libsToInstall, true),
         this.addPackagesToProject(libsToInstallDev),
         this.insertIntoFile('.gitignore', ignores.join('\n'))
       ]);

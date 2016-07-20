@@ -74,7 +74,7 @@ describe('Acceptance: ember generate and destroy api', function() {
         expect(file('.gitignore')).to.contain('/dev.sqlite3');
 
         // TODO: task for npm-install doesn't seem to run in blueprint tests. Should verify these get added to package, but this won't run them.
-        // See https://github.com/ember-cli/ember-cli-internal-test-helpers/blob/master/lib/helpers/disable-npm-on-blueprint.js for where the npm-install task is clobbered.
+        // See https://github.com/ember-cli/ember-cli-internal-test-helpers/blob/master/lib/helpers/disable-npm-on-blueprint.js for where the npm-install task is clobbered, and https://github.com/ember-cli/ember-cli/blob/master/lib/tasks/npm-task.js for where it's being run (and why we can't add to package.json without running real installs, which is a non-starter because it'll slow the test suite down an incredible amount)
 
         // dependencies
         // var pkg = JSON.parse(file('package.json').content)
