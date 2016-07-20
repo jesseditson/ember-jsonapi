@@ -9,11 +9,9 @@ ember init
 ember install ember-jsonapi
 # npm link ember-jsonapi
 ember g api
-# manually re-run ember installs with --save flags (bug)
-npm install --save morgan express jsonapi-express jsonapi-schema jsonapi-knex knex pg jsonwebtoken bcryptjs && npm install --save-dev sqlite3 ember-cookies
 ember g login
-knex migrate:latest
-knex seed:run
+npm run migrate
+npm run seed
 npm start
 ```
 
@@ -22,10 +20,14 @@ npm start
 ```
 ember g route index
 ember g controller index
-# vi app/index/controller.js
+# (hyperterm only)
+# vi app/styles/app.css
+# add:
+# body { background-color: oldlace; }
+# vi app/controllers/index.js
 # add:
 # session: Ember.inject.service()
-# vi app/index/template.hbs
+# vi app/template/index.hbs
 # <h1>Logged in as {{this.session.user.email}}</h1>
 ```
 
@@ -35,11 +37,11 @@ ember g controller index
 # add a new model & schema
 ember g schema post name:string user:belongsTo:user
 ember g migration posts
-knex migrate:latest
+npm run migrate
 # open http://localhost:4200/api/posts/, see that posts are automatically there
 
 # now add the relationship to the user
-vi app/user/schema.json
+vi app/schemas/user.json
 # add: "posts": { "type": "posts", "relationship": "hasMany" }
 # open http://localhost:4200/api/users/1?include=posts, see that posts are now sidechained.
 ```
@@ -47,8 +49,6 @@ vi app/user/schema.json
 # TODO:
 
 [] integration tests for models/schemas & api endpoints
-[] npm deps are not installing with --save / --save-dev, so they are not showing up in consuming app's package.json
-[] add migrate scripts to npm so we don't have to globally install knex?
 
 current lint errors:
 

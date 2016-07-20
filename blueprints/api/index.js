@@ -7,6 +7,7 @@ var isPackageMissing = require('ember-cli-is-package-missing');
 // TODO: add validation, use this to throw when options are wrong
 // var SilentError = require('silent-error');
 var addProductionPackagesToProject = require('../../lib/addProductionPackagesToProject');
+var addPackageScript = require('../../lib/addPackageScript');
 
 module.exports = {
   description: 'Adds an API layer to the express router, using a specified JSONAPIOperations module.',
@@ -112,6 +113,12 @@ module.exports = {
 
     if (hasSecrets) {
       ignores.push('/secrets.json');
+    }
+
+    if (!options.dryRun && locals.driver === 'knex') {
+      addPackageScript.call(this, 'migrate', 'knex migrate:latest')
+      addPackageScript.call(this, 'rollback', 'knex migrate:rollback')
+      addPackageScript.call(this, 'seed', 'knex seed:run')
     }
 
     if (!options.dryRun && (libsToInstall.length || libsToInstallDev.length)) {
