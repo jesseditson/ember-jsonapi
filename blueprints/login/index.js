@@ -21,17 +21,17 @@ module.exports = {
       }
     }
   },
-
-  beforeInstall: function(options) {
-    var task = this.taskFor('generate-from-blueprint', {
-      ui:         this.ui,
-      analytics:  this.analytics,
-      project:    this.project,
-      testing:    this.testing
-    });
-    return Promise.all([
-      task.run({ args: ['route', 'login'] }),
-      task.run({ args: ['controller', 'login'] })
-    ])
-  }
+  // TODO: would be nice if we could just call parent blueprints, but that seems like it's not gonna work right now.
+  // Instead, we just create the same stuff by copying files.
+  // beforeInstall: function(options) {
+    // var task = this.taskFor('generate-from-blueprint', {
+    //   ui:         this.ui,
+    //   analytics:  this.analytics,
+    //   project:    this.project,
+    //   testing:    this.testing
+    // });
+    // return Promise.all([
+    //   task.run({ args: ['route', 'login'] })
+    // ]);
+  // }
 };
