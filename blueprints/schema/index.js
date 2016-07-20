@@ -30,7 +30,9 @@ module.exports = {
       var dasherizedForeignModelSingular = inflection.singularize(dasherizedForeignModel);
 
       var camelizedType = stringUtils.camelize(type);
-      if (/hasMany|belongsTo/.test(camelizedType)) {
+      if (!type) {
+        schema[dasherizedName] = null;
+      } else if (/hasMany|belongsTo/.test(camelizedType)) {
         var foreignModel = stringUtils.dasherize(inflection.pluralize(foreignModel));
         needs.push("'model:" + dasherizedForeignModelSingular + "'");
         schema[dasherizedName] = {
@@ -62,7 +64,10 @@ module.exports = {
   fileMapTokens: function(options) {
     return {
       __schema__: function(options){
-        return options.pod ? 'schema' : options.locals.modelName;
+        return options.pod ? 'schema' : options.locals.schemaName;
+      },
+      __models_path__: function(options) {
+        return options.pod ? options.locals.modelName : 'models';
       },
       __model__: function(options) {
         return options.pod ? 'model' : options.locals.modelName;
