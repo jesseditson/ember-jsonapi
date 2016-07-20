@@ -20,14 +20,14 @@ npm start
 ember g route index
 ember g controller index
 # (hyperterm only)
-# vi app/styles/app.css
-# add:
-# body { background-color: oldlace; }
 # vi app/controllers/index.js
 # add:
 # session: Ember.inject.service()
 # vi app/template/index.hbs
 # <h1>Logged in as {{this.session.user.email}}</h1>
+# vi app/styles/app.css
+# add:
+# body { background-color: oldlace; }
 ```
 
 ### add db-backed model how-to:
