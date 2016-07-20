@@ -1,6 +1,6 @@
 {
   "name": "ember-jsonapi",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Create automatic database-backed JSONAPI endpoints from simple JSON schemas.",
   "scripts": {
     "build": "ember build",
