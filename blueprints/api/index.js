@@ -45,30 +45,37 @@ module.exports = {
       __service__: function(options){
         return options.pod ? 'service' : 'session';
       },
-      __application_path__: function(options) {
+      __adapter__: function(options){
         return options.pod ? 'adapter' : 'application';
+      },
+      __application_path__: function(options) {
+        return options.pod ? 'application' : 'adapters';
       },
       __models_path__: function(options) {
         return options.pod ? 'user' : 'models';
       },
       __schemas_path__: function(options) {
         return options.pod ? 'user' : 'schemas';
+      },
+      __user_schema__: function(options) {
+        return options.pod ? 'schema' : 'users';
+      },
+      __user__: function(options) {
+        return options.pod ? 'model' : 'user';
       }
     }
   },
 
-  beforeInstall: function(options) {
-    // TODO: don't run if server/index.js already exists
-    // but warn if it doesn't include api.js
-    var task = this.taskFor('generate-from-blueprint', {
-      ui:         this.ui,
-      analytics:  this.analytics,
-      project:    this.project,
-      testing:    this.testing
-    })
-    return task.run({
-      args: ['server']
-    })
+  files: function() {
+    var files = this._super.files.apply(this, arguments);
+    if (!this.hasJSHint()) files = files.filter(f => f !== 'server/.jshintrc');
+    return files;
+  },
+
+  hasJSHint: function() {
+    if (this.project) {
+      return 'ember-cli-jshint' in this.project.dependencies();
+    }
   },
 
   afterInstall: function(options) {
@@ -81,6 +88,9 @@ module.exports = {
         (dev ? libsToInstallDev : libsToInstall).push({ name: packageName, target: version })
       }
     }
+
+    installIfMissing(this, 'morgan', '^1.7.0');
+    installIfMissing(this, 'express', '^4.14.0');
 
     installIfMissing(this, 'jsonapi-express', '^0.1.0');
     installIfMissing(this, 'jsonapi-schema', '^0.1.0');
@@ -107,13 +117,11 @@ module.exports = {
     }
 
     if (!options.dryRun && (libsToInstall.length || libsToInstallDev.length)) {
-      var _this = this;
       return Promise.all([
         this.addPackagesToProject(libsToInstall, true),
-        this.addPackagesToProject(libsToInstallDev)
-      ].concat(ignores.map(function(p) {
-        return _this.insertIntoFile('.gitignore', p);
-      })));
+        this.addPackagesToProject(libsToInstallDev),
+        this.insertIntoFile('.gitignore', ignores.join('\n'))
+      ]);
     }
   }
 };
