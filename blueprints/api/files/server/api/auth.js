@@ -39,7 +39,7 @@ router.post('/authenticate', (req, res, next) => {
             message: 'Invalid password.'
           });
         }
-        var token = jwt.sign(u, secrets.jwt_secret)
+        var token = jwt.sign(u, JWT_SECRET)
         res.json({
           success: true,
           token: token

@@ -88,11 +88,9 @@ describe('Acceptance: ember generate and destroy api', function() {
         //   'jsonapi-knex',
         //   'knex',
         //   'pg',
-        //   'sqlite3',
         //   // may be optional in the future (under optional session)
         //   'jsonwebtoken',
         //   'bcryptjs',
-        //   'ember-cookies'
         // ])
         // // devDependencies
         // expect(pkg.devDependencies).to.include.keys([
