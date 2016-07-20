@@ -40,4 +40,15 @@ describe('Acceptance: ember generate and destroy login', function() {
         expect(file('tests/unit/login/controller-test.js')).to.exist;
       })
   });
+
+  it('adds an entry to the router', function() {
+    var args = ['login'];
+
+    return emberNew()
+      .then(() => emberGenerate(args))
+      .then(() => {
+        var router = file('app/router.js');
+        expect(router).to.contain("this.route('login');");
+      })
+  });
 });

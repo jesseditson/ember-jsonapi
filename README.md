@@ -12,8 +12,6 @@ ember g api
 # manually re-run ember installs with --save flags (bug)
 npm install --save morgan express jsonapi-express jsonapi-schema jsonapi-knex knex pg jsonwebtoken bcryptjs && npm install --save-dev sqlite3 ember-cookies
 ember g login
-# add login route to router (bug)
-ember g route login
 knex migrate:latest
 knex seed:run
 npm start
@@ -49,7 +47,6 @@ vi app/user/schema.json
 # TODO:
 
 [] integration tests for models/schemas & api endpoints
-[] login route needs to be added to router when running g login
 [] npm deps are not installing with --save / --save-dev, so they are not showing up in consuming app's package.json
 [] add migrate scripts to npm so we don't have to globally install knex?
 
