@@ -52,6 +52,7 @@
     "ember-inflector": "^1.9.4",
     "ember-router-generator": "^1.2.1",
     "inflection": "^1.10.0",
+    "rsvp": "^3.2.1",
     "silent-error": "^1.0.0"
   },
   "ember-addon": {
