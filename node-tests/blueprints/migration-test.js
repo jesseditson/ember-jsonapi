@@ -29,7 +29,7 @@ describe('Acceptance: ember generate and destroy migration', function() {
         expect(migration).to.contain("table.integer('price');");
         // we don't do anything with null values for now, as we can't detect type.
         expect(migration).to.not.contain("misc");
-        expect(migration).to.contain("knex.schema.dropTable('tacos');");
+        expect(migration).to.contain("knex.schema.dropTable('tacos')");
     }));
   });
 
@@ -45,6 +45,28 @@ describe('Acceptance: ember generate and destroy migration', function() {
         expect(migration).to.contain("table.foreign('filling_id').references('id').inTable('proteins');");
         // we do not create keys for hasMany relationships, as they are defined by the child or in a join table.
         expect(migration).to.not.contain("toppings");
+    }));
+  });
+
+  it('migration taco (through tables)', function() {
+    var args = ['migration', 'taco'];
+
+    return emberNew()
+      .then(() => emberGenerate(['schema', 'taco', 'toppings:hasMany:toppings']))
+      .then(() => {
+        var filePath = 'app/schemas/tacos.json'
+        var tacos = JSON.parse(file(filePath).content);
+        tacos.toppings.through = "taco_toppings";
+        fs.writeFileSync(path.join(process.cwd(), filePath), JSON.stringify(tacos, null, 2), 'utf8');
+      })
+      .then(() => emberGenerateDestroy(args, (file) => {
+        var migration = file('migrations/000001_tacos.js');
+        // idempotently create a join table for this relationship
+        expect(migration).to.contain("createTableIfNotExists('taco_toppings'");
+        expect(migration).to.contain("table.integer('taco_id');");
+        expect(migration).to.contain("table.foreign('taco_id').references('id').inTable('tacos');");
+        expect(migration).to.contain("table.integer('topping_id');");
+        expect(migration).to.contain("table.foreign('topping_id').references('id').inTable('toppings');");
     }));
   });
 });

@@ -47,6 +47,7 @@ module.exports = {
       var schema = JSON.parse(fs.readFileSync(this.schemaFile()));
     } catch (e) { throw new SilentError(`Migration ${schemaName} was not valid JSON: ${e.message}`); }
 
+    var throughRelationships = [];
     var migrationData = Object.keys(schema).reduce((a, k) => {
       var val = schema[k];
       if (!val) {
@@ -59,6 +60,17 @@ module.exports = {
         var table = val.through || val.type;
         a.push(`table.integer('${key}')`);
         a.push(`table.foreign('${key}').references('${foreignKey}').inTable('${table}')`);
+      } else if (val.relationship && val.relationship === 'hasMany' && val.through) {
+        var table = val.through;
+        var key = val.idKey || `${inflection.singularize(schemaName)}_id`;
+        var foreignKey = val.foreignKey || `${inflection.singularize(val.type)}_id`;
+        throughRelationships.push({
+          table: table,
+          key: key,
+          keyTable: schemaName,
+          foreignKey: foreignKey,
+          foreignKeyTable: k
+        });
       } else if (!val.relationship) {
         var type = typeof val === 'string' ? val : val.type;
         if (type === 'number') {
@@ -74,7 +86,8 @@ module.exports = {
     return {
       number: currentNumber,
       schemaName: schemaName,
-      migrationData: migrationData
+      migrationData: migrationData,
+      throughRelationships: throughRelationships
     };
   },
 
