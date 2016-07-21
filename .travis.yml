@@ -1,7 +1,7 @@
 ---
 language: node_js
 node_js:
-  - "0.12"
+  - "5.0"
 
 sudo: false
 
@@ -33,3 +33,4 @@ install:
 
 script:
   - ember try $EMBER_TRY_SCENARIO test
+  - npm run test-blueprints
