@@ -1,4 +1,4 @@
 import JSONAPIModel from 'ember-jsonapi/JSONAPIModel';
 import <%= schemaName %> from '<%= schemaPath %>';
 
-export default JSONAPIModel(<%= schemaName %>);
+export default new JSONAPIModel(<%= schemaName %>);

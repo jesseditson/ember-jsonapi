@@ -18,7 +18,7 @@ describe('Acceptance: ember generate and destroy schema', function() {
       .then(() => emberGenerateDestroy(args, (file) => {
         var model = file('app/models/taco.js');
         expect(model).to.contain("import tacos from '../schemas/tacos';");
-        expect(model).to.contain("export default JSONAPIModel(tacos)");
+        expect(model).to.contain("export default new JSONAPIModel(tacos)");
         var schema = file('app/schemas/tacos.json');
         expect(schema).to.contain("{}");
         var test = file('tests/unit/models/taco-test.js');
