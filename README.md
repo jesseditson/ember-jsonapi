@@ -1,6 +1,8 @@
 # ember-jsonapi
 Create automatic, database-backed JSONAPI endpoints based on incredibly simple JSON schemas.
 
+[![Build Status](https://travis-ci.org/jesseditson/ember-jsonapi.svg?branch=master)](https://travis-ci.org/jesseditson/ember-jsonapi)
+
 ### current setup how-to
 
 ```
