@@ -5,7 +5,8 @@ exports.up = function(knex, Promise) {
     <% for (var m in migrationData) { %><%= migrationData[m] %>;
     <% } %>
   }));
-  <% for (var t in throughRelationships) { var through = throughRelationships[t]; %>operations.push(knex.schema.createTableIfNotExists('<%= through.table %>', table => {
+  <% for (var t in throughRelationships) { var through = throughRelationships[t]; %>
+  operations.push(knex.schema.createTableIfNotExists('<%= through.table %>', table => {
     table.integer('<%= through.key %>');
     table.foreign('<%= through.key %>').references('id').inTable('<%= through.keyTable %>');
     table.integer('<%= through.foreignKey %>');
