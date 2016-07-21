@@ -66,6 +66,9 @@ module.exports = {
       __schema__: function(options){
         return options.pod ? 'schema' : options.locals.schemaName;
       },
+      __schema_path__: function(options) {
+        return options.pod ? options.locals.modelName : 'schemas';
+      },
       __models_path__: function(options) {
         return options.pod ? options.locals.modelName : 'models';
       },

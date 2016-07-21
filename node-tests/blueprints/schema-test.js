@@ -84,4 +84,37 @@ describe('Acceptance: ember generate and destroy schema', function() {
         expect(schema).to.contain('"toppings": {\n    "type": "toppings",\n    "relationship": "hasMany"\n  }');
       }));
   });
+
+  describe('pods: uses singular names regardless of pluralization', function() {
+    function runTests(args) {
+      return emberNew()
+        .then(() => setupPodConfig({ usePods: true }))
+        .then(() => emberGenerateDestroy(args, (file) => {
+          expect(file('app/taco/model.js')).to.exist;
+          expect(file('app/taco/schema.json')).to.exist;
+      }));
+    }
+    it('when specifying plural', function() {
+      return runTests(['schema', 'tacos'])
+    })
+    it('when specifying singular', function() {
+      return runTests(['schema', 'taco'])
+    })
+  });
+
+  describe('legacy: uses singular model and plural schema', function() {
+    function runTests(args) {
+      return emberNew()
+        .then(() => emberGenerateDestroy(args, (file) => {
+          expect(file('app/models/taco.js')).to.exist;
+          expect(file('app/schemas/tacos.json')).to.exist;
+      }));
+    }
+    it('when specifying plural', function() {
+      return runTests(['schema', 'tacos'])
+    })
+    it('when specifying singular', function() {
+      return runTests(['schema', 'taco'])
+    })
+  });
 });
