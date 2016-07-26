@@ -21,19 +21,12 @@ describe('Acceptance: ember generate api', function() {
       .then(() => {
         expect(file('app/adapters/application.js')).to.contain("namespace: 'api'");
         expect(file('server/api/index.js')).to.exist;
+        expect(file('server/api/operations/index.js')).to.exist;
         expect(file('index.js')).to.exist;
         // may not be created in the future (under driver type)
         expect(file('knexfile.js')).to.exist;
         expect(file('server/lib/db.js')).to.exist;
-        expect(file('seeds/seed_users.js')).to.exist;
-        // may not be created in the future (under optional sessions)
         expect(file('secrets.json')).to.exist;
-        expect(file('app/models/user.js')).to.exist;
-        expect(file('app/schemas/users.json')).to.exist;
-        expect(file('app/services/session.js')).to.exist;
-        expect(file('server/api/auth.js')).to.exist;
-        expect(file('migrations/000000_users.js')).to.exist;
-        expect(file('tests/unit/models/user-test.js')).to.exist;
     });
   });
 
@@ -50,15 +43,7 @@ describe('Acceptance: ember generate api', function() {
         // may not be created in the future (under driver type)
         expect(file('knexfile.js')).to.exist;
         expect(file('server/lib/db.js')).to.exist;
-        expect(file('seeds/seed_users.js')).to.exist;
-        // may not be created in the future (under optional sessions)
         expect(file('secrets.json')).to.exist;
-        expect(file('app/user/model.js')).to.exist;
-        expect(file('app/user/schema.json')).to.exist;
-        expect(file('app/session/service.js')).to.exist;
-        expect(file('server/api/auth.js')).to.exist;
-        expect(file('migrations/000000_users.js')).to.exist;
-        expect(file('tests/unit/user/model-test.js')).to.exist;
     });
   });
 
@@ -82,7 +67,6 @@ describe('Acceptance: ember generate api', function() {
     return emberNew()
       .then(() => emberGenerate(args))
       .then(() => {
-
         expect(file('.gitignore')).to.contain('/secrets.json');
         // may not be added in the future (under driver type)
         expect(file('.gitignore')).to.contain('/dev.sqlite3');
@@ -91,7 +75,7 @@ describe('Acceptance: ember generate api', function() {
         // See https://github.com/ember-cli/ember-cli-internal-test-helpers/blob/master/lib/helpers/disable-npm-on-blueprint.js for where the npm-install task is clobbered, and https://github.com/ember-cli/ember-cli/blob/master/lib/tasks/npm-task.js for where it's being run (and why we can't add to package.json without running real installs, which is a non-starter because it'll slow the test suite down an incredible amount)
 
         // dependencies
-        // var pkg = JSON.parse(file('package.json').content)
+        // var pkg = JSON.parse(file('package.json').content);
         // expect(pkg.dependencies).to.include.keys([
         //   // required
         //   'morgan',
@@ -101,17 +85,12 @@ describe('Acceptance: ember generate api', function() {
         //   // may be optional in the future (under driver type)
         //   'jsonapi-knex',
         //   'knex',
-        //   'pg',
-        //   // may be optional in the future (under optional session)
-        //   'jsonwebtoken',
-        //   'bcryptjs',
-        // ])
+        //   'pg'
+        // ]);
         // // devDependencies
         // expect(pkg.devDependencies).to.include.keys([
         //   // may be optional in the future (under driver type)
-        //   'sqlite3',
-        //   // may be optional in the future (under optional session)
-        //   'ember-cookies'
+        //   'sqlite3'
         // ])
     });
   });

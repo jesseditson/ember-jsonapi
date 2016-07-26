@@ -30,39 +30,19 @@ module.exports = {
 
   locals: function(options) {
     var driver = 'knex'; // TODO: support more?
-    var includeSessions = true; // TODO: allow turning off?
 
     return {
-      driver: driver,
-      includeSessions: includeSessions
+      driver: driver
     };
   },
 
   fileMapTokens: function(options) {
     return {
-      __session_path__: function(options) {
-        return options.pod ? 'session' : 'services';
-      },
-      __service__: function(options){
-        return options.pod ? 'service' : 'session';
-      },
       __adapter__: function(options){
         return options.pod ? 'adapter' : 'application';
       },
       __application_path__: function(options) {
         return options.pod ? 'application' : 'adapters';
-      },
-      __models_path__: function(options) {
-        return options.pod ? 'user' : 'models';
-      },
-      __schemas_path__: function(options) {
-        return options.pod ? 'user' : 'schemas';
-      },
-      __user_schema__: function(options) {
-        return options.pod ? 'schema' : 'users';
-      },
-      __user__: function(options) {
-        return options.pod ? 'model' : 'user';
       }
     }
   },
@@ -104,13 +84,6 @@ module.exports = {
       installIfMissing(this, 'sqlite3', '^3.1.4', true);
       ignores.push('/dev.sqlite3');
       hasSecrets = true
-    }
-
-    if (locals.includeSessions) {
-      installIfMissing(this, 'jsonwebtoken', '^7.0.1');
-      installIfMissing(this, 'bcryptjs', '^2.3.0');
-      installIfMissing(this, 'ember-cookies', '^0.0.7', true);
-      hasSecrets = true;
     }
 
     if (hasSecrets) {

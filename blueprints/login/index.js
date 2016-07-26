@@ -2,6 +2,8 @@ var fs = require('fs');
 var path = require('path');
 var chalk = require('chalk');
 var EmberRouterGenerator = require('ember-router-generator');
+var isPackageMissing = require('ember-cli-is-package-missing');
+var addProductionPackagesToProject = require('../../lib/addProductionPackagesToProject');
 
 module.exports = {
   description: 'Creates a login route and controller.',
@@ -11,6 +13,8 @@ module.exports = {
 
   anonymousOptions: [],
 
+  addProductionPackagesToProject: addProductionPackagesToProject,
+
   locals: function(options) {
     options.entity.name = 'login';
     return {};
@@ -18,6 +22,12 @@ module.exports = {
 
   fileMapTokens: function(options) {
     return {
+      __session_path__: function(options) {
+        return options.pod ? 'session' : 'services';
+      },
+      __service__: function(options){
+        return options.pod ? 'service' : 'session';
+      },
       __route__: function(options){
         return options.pod ? 'route' : 'login';
       },
@@ -35,6 +45,18 @@ module.exports = {
       },
       __template_path__: function(options) {
         return options.pod ? 'login' : 'templates';
+      },
+      __models_path__: function(options) {
+        return options.pod ? 'user' : 'models';
+      },
+      __schemas_path__: function(options) {
+        return options.pod ? 'user' : 'schemas';
+      },
+      __user_schema__: function(options) {
+        return options.pod ? 'schema' : 'users';
+      },
+      __user__: function(options) {
+        return options.pod ? 'model' : 'user';
       }
     }
   },
@@ -45,6 +67,25 @@ module.exports = {
 
   afterInstall: function(options) {
     updateRouter.call(this, 'add', options);
+    var locals = this.locals(options);
+    var libsToInstall = [];
+    var libsToInstallDev = [];
+    function installIfMissing(ctx, packageName, version, dev) {
+      if (isPackageMissing(ctx, packageName)) {
+        (dev ? libsToInstallDev : libsToInstall).push({ name: packageName, target: version })
+      }
+    }
+
+    installIfMissing(this, 'jsonwebtoken', '^7.0.1');
+    installIfMissing(this, 'bcryptjs', '^2.3.0');
+    installIfMissing(this, 'ember-cookies', '^0.0.7', true);
+
+    if (!options.dryRun && (libsToInstall.length || libsToInstallDev.length)) {
+      return Promise.all([
+        this.addProductionPackagesToProject(libsToInstall, true),
+        this.addPackagesToProject(libsToInstallDev)
+      ]);
+    }
   },
   afterUninstall: function(options) {
     updateRouter.call(this, 'remove', options);

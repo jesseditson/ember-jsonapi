@@ -1,6 +1,5 @@
 var express = require('express')
 var router = module.exports = express.Router()
-<% if (includeSessions) { %>
 var db = require('../lib/db')
 var jwt = require('jsonwebtoken')
 var bcrypt = require('bcryptjs')
@@ -48,14 +47,12 @@ router.post('/authenticate', (req, res, next) => {
     })
     .catch(next)
 })
-<% } %>
 
 module.exports.middleware = function(req, res, next) {
   // allow public access for get requests
   if (req.method === 'GET') return next()
   // add additional exceptions here
   // if (req.method === 'POST' && /^\/resource/.test(req.path)) return next()
-  <% if (includeSessions) { %>
   // check header or url parameters or post parameters for token
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
   // decode token
@@ -78,10 +75,4 @@ module.exports.middleware = function(req, res, next) {
         message: 'No token provided.'
     });
   }
-  <% } else { %>
-  return res.status(403).send({
-      success: false,
-      message: 'Not logged in.'
-  });
-  <% } %>
 }

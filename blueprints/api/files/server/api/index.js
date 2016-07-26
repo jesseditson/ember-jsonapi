@@ -4,24 +4,15 @@ var JSONAPI = require('jsonapi-express');
 var schema = require('jsonapi-schema');
 var path = require('path');
 var schemas = schema.loadSchemas(path.join(process.cwd(), 'app'));
-<% if (includeSessions) { %>var auth = require('./auth');<% } %>
 <% if (driver === 'knex') { %>
-var db = require('../lib/db');
-var JSONAPIOperations = require('jsonapi-knex')(db, schemas);
+var operations = require('./operations')(schemas, {});
 <% } else { %>
-var JSONAPIOperations = {};
+var operations = {};
 <% } %>
+// Add your authorize operation here:
+// operations.authorize = auth.middleware;
 
-JSONAPIOperations.transforms = {
-  /**
-   * Add transforms here in the format of:
-  [schemaName]: function(records, req) {
-    return [Promise returning records, or transformed records]
-  }
-   */
-};
-<% if (includeSessions) { %>
-JSONAPIOperations.authorize = auth.middleware;
-<% } %>
-router.use(auth);
-router.use('/', JSONAPI(JSONAPIOperations, schemas, '/api'));
+// Add your login middleware here
+// router.use(auth);
+
+router.use('/', JSONAPI(operations, schemas, '/api'));
