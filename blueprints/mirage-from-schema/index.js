@@ -57,14 +57,15 @@ module.exports = {
     }, []);
 
     var schemaName = this.schemaName();
-    var schemaPath = '../../app/' + (options.pod ? schemaName : 'schemas') + '/' + (options.pod ? 'schema' : schemaName);
+    var modelName = this.modelName();
+    var schemaPath = '../../app/' + (options.pod ? modelName : 'schemas') + '/' + (options.pod ? 'schema' : schemaName);
 
     return {
       fields: fields,
       hasFaker: hasFaker,
       schemaPath: schemaPath,
       schemaName: schemaName,
-      modelName: this.modelName()
+      modelName: modelName
     };
   },
 
