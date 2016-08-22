@@ -23,6 +23,11 @@ ember-jsonapi comes with blueprints for the following types:
 
 This creates a schema file and an associated ember model and model unit test. For detailed usage instructions, run `ember help generate schema`.
 
+- **mirage-from-schema** (`ember generate mirage-from-schema <schema>`)
+
+Creates a mirage model and factory based on a schema generated with the above schema command.
+> Note that this requires you to already have installed ember-cli-mirage, and initialized the project with the mirage folder structure.
+
 - **migration** (`ember generate migration <schema>`)
 
 Generates a knex migration based on a schema.
