@@ -56,9 +56,10 @@ module.exports = {
       return a;
     }, []);
 
+    var appName = this.project.pkg.name;
     var schemaName = this.schemaName();
     var modelName = this.modelName();
-    var schemaPath = '../../app/' + (options.pod ? modelName : 'schemas') + '/' + (options.pod ? 'schema' : schemaName);
+    var schemaPath = appName + '/' + (options.pod ? modelName : 'schemas') + '/' + (options.pod ? 'schema' : schemaName);
 
     return {
       fields: fields,

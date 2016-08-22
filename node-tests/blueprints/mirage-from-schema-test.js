@@ -23,7 +23,7 @@ describe('Acceptance: ember generate and destroy mirage from schema', function()
       .then(() => emberGenerate(['schema', 'taco', 'name:string', 'price:number', 'time:date', 'cheese:boolean', 'misc']))
       .then(() => emberGenerateDestroy(args, (file) => {
         var model = file('mirage/models/taco.js');
-        expect(model).to.contain("import tacos from '../../app/schemas/tacos';");
+        expect(model).to.contain("import tacos from 'my-app/schemas/tacos';");
         expect(model).to.contain("export default new JSONAPIMirageModel(tacos);");
         var factory = file('mirage/factories/taco.js');
         expect(factory).to.contain("import { Factory, faker } from 'ember-cli-mirage';");
@@ -43,7 +43,7 @@ describe('Acceptance: ember generate and destroy mirage from schema', function()
       .then(() => emberGenerate(['schema', 'taco', 'name:string', 'price:number', 'misc']))
       .then(() => emberGenerateDestroy(args, (file) => {
         var model = file('mirage/models/taco.js');
-        expect(model).to.contain("import tacos from '../../app/taco/schema';");
+        expect(model).to.contain("import tacos from 'my-app/taco/schema';");
     }));
   });
 
