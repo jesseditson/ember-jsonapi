@@ -4,12 +4,12 @@ import relationships from 'ember-data/relationships';
 import { singularize } from 'ember-inflector';
 
 export default function JSONAPIModel(schema, configs) {
-  return Model.extend(schemaParser(schema, configs));
+  return Model.extend(schemaParser(schema, configs || {}));
 }
 
 function parseConfig(config) {
-  if (config === undefined) return;
-  if (typeof config === 'object') return config;
+  if (config === undefined) { return; }
+  if (typeof config === 'object') { return config; }
   return { defaultValue: config };
 }
 
