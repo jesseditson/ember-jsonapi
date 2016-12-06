@@ -74,6 +74,7 @@ module.exports = {
     installIfMissing(this, 'express', '^4.14.0');
 
     installIfMissing(this, 'jsonapi-express');
+    installIfMissing(this, 'body-parser');
     installIfMissing(this, 'jsonapi-schema');
 
     var hasSecrets = false
