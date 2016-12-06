@@ -5,7 +5,7 @@
   "scripts": {
     "build": "ember build",
     "start": "ember server",
-    "test": "ember try:each",
+    "test": "ember try:one",
     "test-blueprints": "mocha node-tests --recursive"
   },
   "repository": "git@github.com:jesseditson/ember-jsonapi.git",

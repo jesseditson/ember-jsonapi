@@ -1,4 +1,4 @@
 import JSONAPIMirageModel from 'ember-jsonapi/JSONAPIMirageModel';
-import <%= schemaName %> from '<%= schemaPath %>';
+import <%= camelizedSchemaName %> from '<%= schemaPath %>';
 
-export default new JSONAPIMirageModel(<%= schemaName %>);
+export default new JSONAPIMirageModel(<%= camelizedSchemaName %>);

@@ -1,5 +1,6 @@
 var inflection  = require('inflection');
 var SilentError = require('silent-error');
+var stringUtils = require('ember-cli-string-utils');
 var fs = require('fs');
 var path = require('path');
 
@@ -24,10 +25,10 @@ module.exports = {
   ],
 
   schemaName: function() {
-    return inflection.pluralize(this.options.entity.name);
+    return stringUtils.dasherize(inflection.pluralize(this.options.entity.name));
   },
   modelName() {
-    return inflection.singularize(this.options.entity.name);
+    return stringUtils.dasherize(inflection.singularize(this.options.entity.name));
   },
 
   schemaFile: function() {
@@ -41,7 +42,7 @@ module.exports = {
   locals: function(options) {
     try {
       var schema = JSON.parse(fs.readFileSync(this.schemaFile()));
-    } catch (e) { throw new SilentError(`Migration ${schemaName} was not valid JSON: ${e.message}`); }
+    } catch (e) { throw new SilentError(`Migration ${schemaName} not found or was not valid JSON: ${e.message}`); }
     var hasFaker = false;
     var fields = Object.keys(schema).reduce((a, k) => {
       var field = schema[k];
@@ -66,7 +67,8 @@ module.exports = {
       hasFaker: hasFaker,
       schemaPath: schemaPath,
       schemaName: schemaName,
-      modelName: modelName
+      modelName: modelName,
+      camelizedSchemaName: stringUtils.camelize(schemaName)
     };
   },
 
