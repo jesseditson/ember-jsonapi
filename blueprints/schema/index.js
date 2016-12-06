@@ -13,8 +13,8 @@ module.exports = {
   locals: function(options) {
     var needs = [];
     var entityOptions = options.entity.options;
-    var schemaName = inflection.pluralize(options.entity.name);
-    var modelName = inflection.singularize(options.entity.name);
+    var schemaName = stringUtils.dasherize(inflection.pluralize(options.entity.name));
+    var modelName = stringUtils.dasherize(inflection.singularize(options.entity.name));
     var schema = {};
 
     for (var name in entityOptions) {
@@ -24,23 +24,22 @@ module.exports = {
         foreignModel = type.split(':')[1];
         type = type.split(':')[0];
       }
-      var dasherizedName = stringUtils.dasherize(name);
       var camelizedName = stringUtils.camelize(name);
       var dasherizedForeignModel = stringUtils.dasherize(foreignModel);
       var dasherizedForeignModelSingular = inflection.singularize(dasherizedForeignModel);
 
       var camelizedType = stringUtils.camelize(type);
       if (!type) {
-        schema[dasherizedName] = null;
+        schema[name] = null;
       } else if (/hasMany|belongsTo/.test(camelizedType)) {
         var foreignModel = stringUtils.dasherize(inflection.pluralize(foreignModel));
         needs.push("'model:" + dasherizedForeignModelSingular + "'");
-        schema[dasherizedName] = {
-          type: foreignModel,
+        schema[name] = {
+          type: inflection.pluralize(dasherizedForeignModel),
           relationship: camelizedType
         };
       } else {
-        schema[dasherizedName] = camelizedType;
+        schema[name] = camelizedType;
       }
     }
 
@@ -57,7 +56,10 @@ module.exports = {
       schemaName: schemaName,
       modelName: modelName,
       needs: needs,
-      schemaPath: schemaPath
+      schemaPath: schemaPath,
+      humanModelName: modelName.replace('-', ' '),
+      camelizedSchemaName: stringUtils.camelize(schemaName),
+      camelizedModelName: stringUtils.camelize(modelName)
     };
   },
 

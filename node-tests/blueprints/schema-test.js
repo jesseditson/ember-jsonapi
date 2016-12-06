@@ -102,7 +102,7 @@ describe('Acceptance: ember generate and destroy schema', function() {
     })
   });
 
-  describe('legacy: uses singular model and plural schema', function() {
+  it('legacy: uses singular model and plural schema', function() {
     function runTests(args) {
       return emberNew()
         .then(() => emberGenerateDestroy(args, (file) => {
@@ -116,5 +116,64 @@ describe('Acceptance: ember generate and destroy schema', function() {
     it('when specifying singular', function() {
       return runTests(['schema', 'taco'])
     })
+  });
+
+  describe('dasherization & camelization', function() {
+
+    it('pods: dasherizes and camelizes paths correctly', function() {
+      return emberNew()
+        .then(() => setupPodConfig({ usePods: true }))
+        .then(() => emberGenerateDestroy(['schema', 'flimmerFlammer'], (file) => {
+          var model = file('app/flimmer-flammer/model.js');
+          var schema = file('app/flimmer-flammer/schema.json');
+          var test = file('tests/unit/flimmer-flammer/model-test.js');
+          expect(model).to.exist;
+          expect(schema).to.exist;
+          expect(test).to.exist;
+          expect(model).to.contain("import flimmerFlammers from './schema';");
+          expect(model).to.contain('new JSONAPIModel(flimmerFlammers)')
+          expect(test).to.contain("moduleForModel('flimmer-flammer', 'Unit | Model | flimmer flammer', {");
+          expect(test).to.contain("const flimmerFlammer = this.subject({});");
+      }));
+    });
+
+    it('legacy: dasherizes and camelizes paths correctly', function() {
+      return emberNew()
+        .then(() => emberGenerateDestroy(['schema', 'flimmerFlammer'], (file) => {
+          var model = file('app/models/flimmer-flammer.js');
+          var schema = file('app/schemas/flimmer-flammers.json');
+          var test = file('tests/unit/models/flimmer-flammer-test.js');
+          expect(model).to.exist;
+          expect(schema).to.exist;
+          expect(test).to.exist;
+          expect(model).to.contain("import flimmerFlammers from '../schemas/flimmer-flammers';");
+          expect(model).to.contain('new JSONAPIModel(flimmerFlammers)')
+          expect(test).to.contain("moduleForModel('flimmer-flammer', 'Unit | Model | flimmer flammer', {");
+          expect(test).to.contain("const flimmerFlammer = this.subject({});");
+      }));
+    });
+
+    it('dasherizes relationship model names (pods)', function() {
+      var args = ['schema', 'flimmerFlammer', 'flimmerToppings:hasMany:flimmerToppings', 'flammerThing:belongsTo:flammerModel'];
+
+      return emberNew()
+        .then(() => setupPodConfig({ usePods: true }))
+        .then(() => emberGenerateDestroy(args, (file) => {
+          var schema = file('app/flimmer-flammer/schema.json');
+          expect(schema).to.contain('"flammerThing": {\n    "type": "flammer-models",\n    "relationship": "belongsTo"\n  }');
+          expect(schema).to.contain('"flimmerToppings": {\n    "type": "flimmer-toppings",\n    "relationship": "hasMany"\n  }');
+      }));
+    });
+
+    it('dasherizes relationship model names (legacy)', function() {
+      var args = ['schema', 'flimmerFlammer', 'flimmerToppings:hasMany:flimmerToppings', 'flammerThing:belongsTo:flammerModel'];
+
+      return emberNew()
+        .then(() => emberGenerateDestroy(args, (file) => {
+          var schema = file('app/schemas/flimmer-flammers.json');
+          expect(schema).to.contain('"flammerThing": {\n    "type": "flammer-models",\n    "relationship": "belongsTo"\n  }');
+          expect(schema).to.contain('"flimmerToppings": {\n    "type": "flimmer-toppings",\n    "relationship": "hasMany"\n  }');
+      }));
+    });
   });
 });
