@@ -5,7 +5,7 @@
   "scripts": {
     "build": "ember build",
     "start": "ember server",
-    "test": "ember try:each",
+    "test": "ember try:one",
     "test-blueprints": "mocha node-tests --recursive"
   },
   "repository": "git@github.com:jesseditson/ember-jsonapi.git",
@@ -27,7 +27,6 @@
     "ember-cli-qunit": "^1.4.2",
     "ember-cli-release": "^0.2.9",
     "ember-cli-sri": "^2.1.0",
-    "ember-cli-test-loader": "^1.1.0",
     "ember-cli-uglify": "^1.2.0",
     "ember-data": "^2.4.2",
     "ember-disable-prototype-extensions": "^1.1.0",
