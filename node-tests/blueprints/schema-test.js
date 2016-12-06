@@ -154,24 +154,24 @@ describe('Acceptance: ember generate and destroy schema', function() {
     });
 
     it('dasherizes relationship model names (pods)', function() {
-      var args = ['schema', 'flimmerFlammer', 'flimmerToppings:hasMany:flimmerToppings', 'flammerThing:belongsTo:flammerModel'];
+      var args = ['schema', 'flimmerFlammer', 'flimmerToppings:hasMany:flimmerToppings', 'flammerThing:belongsTo:tickleMeDaddy'];
 
       return emberNew()
         .then(() => setupPodConfig({ usePods: true }))
         .then(() => emberGenerateDestroy(args, (file) => {
           var schema = file('app/flimmer-flammer/schema.json');
-          expect(schema).to.contain('"flammerThing": {\n    "type": "flammer-models",\n    "relationship": "belongsTo"\n  }');
+          expect(schema).to.contain('"flammerThing": {\n    "type": "tickle-me-daddies",\n    "relationship": "belongsTo"\n  }');
           expect(schema).to.contain('"flimmerToppings": {\n    "type": "flimmer-toppings",\n    "relationship": "hasMany"\n  }');
       }));
     });
 
     it('dasherizes relationship model names (legacy)', function() {
-      var args = ['schema', 'flimmerFlammer', 'flimmerToppings:hasMany:flimmerToppings', 'flammerThing:belongsTo:flammerModel'];
+      var args = ['schema', 'flimmerFlammer', 'flimmerToppings:hasMany:flimmerToppings', 'flammerThing:belongsTo:tickleMeDaddy'];
 
       return emberNew()
         .then(() => emberGenerateDestroy(args, (file) => {
           var schema = file('app/schemas/flimmer-flammers.json');
-          expect(schema).to.contain('"flammerThing": {\n    "type": "flammer-models",\n    "relationship": "belongsTo"\n  }');
+          expect(schema).to.contain('"flammerThing": {\n    "type": "tickle-me-daddies",\n    "relationship": "belongsTo"\n  }');
           expect(schema).to.contain('"flimmerToppings": {\n    "type": "flimmer-toppings",\n    "relationship": "hasMany"\n  }');
       }));
     });

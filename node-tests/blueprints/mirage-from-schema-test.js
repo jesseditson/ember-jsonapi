@@ -44,21 +44,35 @@ describe('Acceptance: ember generate and destroy mirage from schema', function()
       .then(() => emberGenerateDestroy(args, (file) => {
         var model = file('mirage/models/taco.js');
         expect(model).to.contain("import tacos from 'my-app/taco/schema';");
+        expect(model).to.contain('new JSONAPIMirageModel(tacos)');
     }));
   });
 
-  // it('migration taco (relationships)', function() {
-  //   var args = ['migration', 'taco'];
-  //
-  //   return emberNew()
-  //     .then(() => emberGenerate(['schema', 'taco', 'filling:belongsTo:protein', 'toppings:hasMany:toppings']))
-  //     .then(() => emberGenerateDestroy(args, (file) => {
-  //       var migration = file('migrations/000001_tacos.js');
-  //       // we create foreign keys for our belongsTo relationships
-  //       expect(migration).to.contain("table.integer('filling_id');");
-  //       expect(migration).to.contain("table.foreign('filling_id').references('id').inTable('proteins');");
-  //       // we do not create keys for hasMany relationships, as they are defined by the child or in a join table.
-  //       expect(migration).to.not.contain("toppings");
-  //   }));
-  // });
+  it('migration taco (relationships)', function() {
+    var args = ['migration', 'taco'];
+
+    return emberNew()
+      .then(() => emberGenerate(['schema', 'taco', 'filling:belongsTo:protein', 'toppings:hasMany:toppings']))
+      .then(() => emberGenerateDestroy(args, (file) => {
+        var migration = file('migrations/000001_tacos.js');
+        // we create foreign keys for our belongsTo relationships
+        expect(migration).to.contain("table.integer('filling_id');");
+        expect(migration).to.contain("table.foreign('filling_id').references('id').inTable('proteins');");
+        // we do not create keys for hasMany relationships, as they are defined by the child or in a join table.
+        expect(migration).to.not.contain("toppings");
+    }));
+  });
+
+  it('mirage-from-schema dasherization (pods)', function() {
+    var args = ['mirage-from-schema', 'tickleMeDaddy'];
+
+    return emberNew()
+      .then(() => setupPodConfig({ usePods: true }))
+      .then(() => emberGenerate(['schema', 'tickleMeDaddy', 'name:string', 'price:number', 'misc']))
+      .then(() => emberGenerateDestroy(args, (file) => {
+        var model = file('mirage/models/tickle-me-daddy.js');
+        expect(model).to.contain("import tickleMeDaddies from 'my-app/tickle-me-daddy/schema';");
+        expect(model).to.contain('new JSONAPIMirageModel(tickleMeDaddies)');
+    }));
+  });
 });
