@@ -13,6 +13,12 @@ function parseConfig(config) {
   return { defaultValue: config };
 }
 
+/**
+ * schemaParser
+ * @param  {Object} schema  - a schema object defining a model
+ * @param  {Object} configs - per-property config/default objects
+ * @return {DS.Model}       - An ember model
+ */
 function schemaParser(schema, configs) {
   return Object.keys(schema).reduce((model, key) => {
     var info = schema[key];
