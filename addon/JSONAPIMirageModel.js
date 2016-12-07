@@ -23,7 +23,6 @@ function schemaParser(schema, configs) {
     var config = parseConfig(configs[key]);
     var type = singularize(info.type);
     if (info.relationship === 'hasMany') {
-      console.log(key, type, config);
       model[key] = hasMany(type, config);
     } else if (info.relationship === 'belongsTo') {
       model[key] = belongsTo(type, config);

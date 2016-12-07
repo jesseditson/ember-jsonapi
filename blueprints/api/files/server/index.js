@@ -18,10 +18,8 @@ module.exports = function(app) {
   /**
    * API Error Handler
    */
-  app.use('/api', (err, req, res, next) => {
-    console.log(err.stack);
-    res.status(err ? 500 : 404).json({
-      error: err ? err.message : 'Not Found'
-    });
-  });
+   app.use('/api', (err, req, res, next) => {
+     console.log(err.stack);
+     res.status(500).json({ error: err.message });
+   });
 };
