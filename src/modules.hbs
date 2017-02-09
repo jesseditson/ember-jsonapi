@@ -96,28 +96,29 @@ var operations = {}; // more on operations below
 app.use('/api', JSONAPI(operations, schemas, '/api'));
 ```
 
-The above, when passed our article schema, would create the following endpoints:
+The above, when passed our article schema, would create the following endpoints, mapped to the operations in parentheses:
 
 ```
-GET    /api/articles
-GET    /api/articles/:id
-POST   /api/articles
-PATCH  /api/articles/:id
-DELETE /api/articles/:id
-GET    /api/articles/:id/comments
-GET    /api/articles/:id/relationships/comments
-POST   /api/articles/:id/relationships/comments
-PATCH  /api/articles/:id/relationships/comments
-DELETE /api/articles/:id/relationships/comments
+GET    /api/articles        (findAll)
+GET    /api/articles/:id    (findOne)
+POST   /api/articles        (create)
+PATCH  /api/articles/:id    (update)
+DELETE /api/articles/:id    (delete)
+GET    /api/articles/:id/comments                (findOne or findAll, depending on relationship type)
+GET    /api/articles/:id/relationships/comments  (findAll)
+POST   /api/articles/:id/relationships/comments  (updateRelationship)
+PATCH  /api/articles/:id/relationships/comments  (updateRelationship)
+DELETE /api/articles/:id/relationships/comments  (updateRelationship)
 ```
 
 `jsonapi-express` handles setting the correct headers, returning the correct error codes, and aims to be a common module that can track against the JSON API spec without having to manually update resource routes in your application.
 
-To function though, `jsonapi-express` requires an operations object to be passed in, with the following required keys:
+To function though, `jsonapi-express` requires an operations object to be passed in, with any of the following operations defined:
 
 - `findAll`: a function for finding records
 - `findOne`: a function for finding a single record
 - `create`:  a function for creating a record
+- `update`:  a function for creating a record
 - `delete`:  a function for deleting a record
 - `updateRelationship`: a function for updating the relationship between two records
 
@@ -126,7 +127,9 @@ In addition, the following optional operations can be passed in:
 - `transforms`: a hash of `[schema name] : [function]` pairs, which is called whenever this record is fetched from the db, before it is parsed by `jsonapi-schema`. This is useful for modifying data without having to specify an if statement inside of a query operation.
 - `authorize`: an express middleware that is expected to either call `next` if the user is allowed to access `req.url`, or send a `4xx` if not.
 
-For more information on operation method signatures and usage, see the [jsonapi-express documentation](#todo).
+For ORM use, you can add global operations at the root. If you would like to override operations per-model (or not provide base operations), you can pass in an object with the name of the model to your operations, e.g. `operations.article.create` could be a function specifically for creating an article.
+
+If you provide neither a model-level operation or a base-level operation, the route that is unmatched will just call `next()`, handing control of the request back to your application routes.
 
 # <a name="jsonapi-knex"></a> `jsonapi-knex`
 ---

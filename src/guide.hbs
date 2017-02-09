@@ -9,31 +9,11 @@ ember install ember-jsonapi
 ember generate api
 ```
 
-This creates the files needed to run our JSON API server.
+This sets up a `server` folder, which contains a small express server that will be run alongside your client side application when running `ember serve`.
+
+In addition, this will add a `knexfile.js`, which is used to configure your database connection.
 
 The default `knexfile.js` just uses a sqlite database called `dev.sqlite3` in the root of our application. If you'd like to connect to a different database, you can modify `knexfile.js`.
-
-Also in the root of the project will be a file called `secrets.json`. It is very important to avoid adding this file to vcs, and it has automatically been added to `.gitignore` to help prevent footgun. This is where you can add your database credentials for staging/production environments. To keep things secure, it's recommended that you change the `jwt_secret` field. Finally, it includes credentials for a seed user that will be created when initializing the database.
-
-#### Authenticating a user
-
-The api blueprint also creates a knex migration & seed to create our user database that our auth will use. To set up our database, first install knex globally, then run our migrations and seeds:
-
-```
-npm install knex -g
-knex migrate:latest
-knex seed:run
-```
-
-We now have a database with a `users` table, and since the api automatically creates a `users` schema and model, you can log a user in via the `session` service.
-
-To make this even simpler, `ember-jsonapi` provides a blueprint for creating a simple login screen:
-
-```
-ember g login
-```
-
-Now, you can run your server using `npm start` or `ember serve`. If you visit [http://localhost:4200/login](http://localhost:4200/login) and enter the credentials in secrets.json, you'll be logged in.
 
 #### Adding an api endpoint
 
@@ -80,3 +60,9 @@ exports.down = function(knex, Promise) {
 ```
 
 Finally, let's apply our migration by running `knex migrate:latest`, and start our server. Now if you visit [http://localhost:4200/api/todos](http://localhost:4200/api/todos) you'll see that it returns an (empty) list of todos.
+
+#### Complex operations
+
+While the automatic CRUD works for most basic models, it's common to come across use-cases where this naive implementation may be slow or need to be extended.
+
+TODO: operations docs

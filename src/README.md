@@ -34,8 +34,8 @@ Generates a knex migration based on a schema.
 
 - **api** (`ember generate api`)
 
-This generates ember-jsonapi server and api files, along with a session service and auth endpoint for authenticating users via [JSON web tokens](https://jwt.io/). This API automatically loads schemas from the application and sets up fully JSON API compatible endpoints under the `/api` endpoint. Additionally, this blueprint prepares the `/server` folder to be production-compatible, so you may deploy the ember application as an express application.
+This generates `ember-jsonapi` server and api files. This API automatically loads schemas from the application and sets up fully JSON API compatible endpoints under the `/api` endpoint. Additionally, this blueprint prepares the `/server` folder to be production-compatible, so you may deploy the ember application as an express application.
 
-- **login** (`ember generate login`)
+- **operation** (`ember generate operation <schema>`)
 
-This generates a route, controller, and template for a super simple login view that uses the service and endpoints create by the `ember generate api` command.
+This generates a new `operations/<schemas>/<name>` operation, which can be requested via `/schemas` and follows JSONAPI standards.
