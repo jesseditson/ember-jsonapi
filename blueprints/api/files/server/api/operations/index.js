@@ -1,5 +1,7 @@
+<% if (driver === 'knex') { %>
 var db = require('../../lib/db');
 var JSONAPIOperations = require('jsonapi-knex');
+<% } %>
 var path = require('path');
 var fs = require('fs');
 
@@ -10,7 +12,7 @@ var applicationOps = fs.readdirSync(__dirname).reduce((o, f) => {
   }
   return o;
 }, {});
-
+<% if (driver === 'knex') { %>
 /**
  * operations - creates a jsonapi-express compatible operations object
  * @param  {object} schemas - key:value pairs of schemaName:schema
@@ -38,3 +40,6 @@ module.exports = function(schemas, tables) {
   })
   return ops;
 }
+<% } else { %>
+module.exports = applicationOps;
+<% } %>

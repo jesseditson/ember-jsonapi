@@ -1,8 +1,3 @@
-// TODO:
-// update auth.js to be driver agnostic
-
-var inflection  = require('inflection');
-var stringUtils = require('ember-cli-string-utils');
 var isPackageMissing = require('ember-cli-is-package-missing');
 // TODO: add validation, use this to throw when options are wrong
 // var SilentError = require('silent-error');
